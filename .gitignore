@@ -1,0 +1,27 @@
+# Local settings and credentials
+.env
+.env.*
+!.env.example
+
+# Python environments, generated files, and local SQLite data
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Frontend generated files (when the frontend is added)
+node_modules/
+.next/
+out/
+coverage/
+
+# Local editor and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
