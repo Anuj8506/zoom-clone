@@ -161,7 +161,7 @@ storing it and attaches UTC when reading it back. That keeps comparisons and JSO
 responses consistent.
 
 For example, `2030-01-10T14:30:00+05:30` represents the same instant as
-`2030-01-10T09:00:00Z`. The future frontend converts UTC to the viewer's local time.
+`2030-01-10T09:00:00Z`. The frontend converts UTC to the viewer's local time.
 Naive strings such as `2030-01-10T14:30:00` are rejected because their timezone is unknown.
 
 ### Repeatable seed data

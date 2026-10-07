@@ -61,8 +61,8 @@ settings are present; it does not check that those credentials work remotely.
 The API secret stays on the Python server. `.env` is ignored by Git.
 
 The frontend's base URL defaults to `http://localhost:3000`. Invite links have
-the form `http://localhost:3000/join/{meeting_code}`. The frontend does not exist
-yet, but `/meetings/lookup` can validate those generated links.
+the form `http://localhost:3000/join/{meeting_code}`. Start the Next.js frontend
+on port 3000 to open those links; `/meetings/lookup` also validates them.
 
 ## Database and sample records
 

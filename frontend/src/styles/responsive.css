@@ -1,0 +1,546 @@
+/* Responsive layouts */
+@media (min-width: 1500px) {
+  .page-content {
+    padding-top: 53px;
+  }
+  .home-hero {
+    gap: 70px;
+  }
+  .clock-landscape {
+    height: 265px;
+  }
+  .action-tiles {
+    row-gap: 31px;
+  }
+  .tile-icon {
+    width: 91px;
+    height: 91px;
+  }
+}
+@media (max-width: 1100px) {
+  :root {
+    --sidebar: 185px;
+  }
+  .topbar {
+    padding: 0 28px;
+  }
+  .page-content {
+    padding: 34px 28px 15px;
+  }
+  .home-hero {
+    gap: 22px;
+    grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.05fr);
+  }
+  .clock-landscape {
+    height: 223px;
+  }
+  .action-tiles {
+    row-gap: 27px;
+  }
+  .tile-description {
+    font-size: 9px;
+  }
+  .app-footer {
+    padding: 21px 28px;
+  }
+  .clock-next {
+    padding: 20px 15px;
+  }
+  .panel-heading > .text-link {
+    font-size: 10px;
+  }
+}
+@media (max-width: 900px) {
+  :root {
+    --sidebar: 76px;
+  }
+  .sidebar {
+    padding: 25px 12px;
+  }
+  .sidebar > .wordmark {
+    font-size: 25px;
+    margin: 0 0 33px;
+    justify-content: center;
+  }
+  .sidebar > .wordmark > span,
+  .workspace-label,
+  .nav-arrow,
+  .sidebar-bottom {
+    display: none;
+  }
+  .nav-item {
+    font-size: 0;
+    gap: 0;
+    padding: 14px;
+    justify-content: center;
+  }
+  .topbar-title {
+    display: none;
+  }
+  .topbar {
+    height: 66px;
+  }
+  .search-box {
+    margin-left: 0;
+  }
+  .topbar-actions {
+    margin-left: auto;
+  }
+  .page-heading h1 {
+    font-size: 28px;
+  }
+  .page-heading {
+    margin-bottom: 30px;
+  }
+  .home-hero {
+    gap: 15px;
+  }
+  .tile-icon {
+    width: 73px;
+    height: 73px;
+    border-radius: 21px;
+  }
+  .clock-time {
+    font-size: 52px;
+  }
+  .clock-top > span:first-child {
+    font-size: 8px;
+  }
+  .clock-next > .text-link {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .page-content {
+    padding: 27px 20px 12px;
+  }
+  .topbar {
+    padding: 0 20px;
+  }
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: 31px;
+    margin-bottom: 27px;
+  }
+  .quick-actions {
+    padding: 10px 0;
+  }
+  .action-tiles {
+    max-width: 370px;
+    column-gap: 20px;
+    row-gap: 26px;
+  }
+  .tile-icon {
+    width: 80px;
+    height: 80px;
+  }
+  .tile-description {
+    font-size: 10px;
+  }
+  .clock-landscape {
+    height: 215px;
+  }
+  .clock-time {
+    margin-top: 27px;
+  }
+  .clock-next {
+    padding: 18px;
+  }
+  .clock-next > .text-link {
+    display: inline-flex;
+  }
+  .app-footer {
+    padding: 22px 20px;
+  }
+  .app-footer > span:last-child {
+    display: none;
+  }
+  .meeting-row {
+    padding: 18px 16px;
+    gap: 11px;
+  }
+  .meeting-row-actions {
+    gap: 5px;
+  }
+  .meeting-row-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .meeting-title-line {
+    gap: 5px;
+  }
+  .meeting-row-details p {
+    font-size: 9px;
+  }
+  .panel-heading {
+    padding: 0 16px;
+  }
+  .tabs {
+    gap: 18px;
+  }
+  .panel-heading > .text-link {
+    gap: 5px;
+    font-size: 9px;
+  }
+  .page-heading > .button {
+    font-size: 10px;
+    padding: 9px;
+    min-width: 0;
+  }
+  .page-heading > .button > svg {
+    display: none;
+  }
+  .page-heading p {
+    font-size: 11px;
+  }
+  .eyebrow {
+    font-size: 8px;
+  }
+  .settings-card {
+    padding: 22px;
+  }
+  .lobby-header {
+    padding: 0 22px;
+    height: 70px;
+  }
+  .lobby-main {
+    padding: 32px 22px;
+  }
+  .lobby-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .camera-preview {
+    height: 280px;
+  }
+  .lobby-title h1 {
+    font-size: 25px;
+  }
+  .lobby-details {
+    padding: 24px;
+  }
+  .room-stage {
+    padding: 12px;
+  }
+  .room-code {
+    display: none;
+  }
+  .room-header {
+    padding: 0 12px;
+  }
+  .meeting-toolbar {
+    gap: 5px;
+    padding: 7px 9px;
+    min-height: 76px;
+  }
+  .toolbar-group,
+  .toolbar-group.center {
+    gap: 2px;
+  }
+  .toolbar-control {
+    min-width: 56px;
+    min-height: 60px;
+    padding: 5px !important;
+  }
+  .toolbar-control > span:last-child {
+    font-size: 8px;
+  }
+  .toolbar-control svg {
+    width: 21px;
+  }
+  .leave-button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .leave-button svg {
+    display: none;
+  }
+  .participants-panel {
+    width: 220px;
+  }
+  .room-header-actions {
+    gap: 8px;
+  }
+  .connection-label {
+    font-size: 8px;
+  }
+}
+@media (max-width: 480px) {
+  :root {
+    --sidebar: 60px;
+  }
+  .sidebar {
+    padding: 24px 6px;
+  }
+  .sidebar > .wordmark {
+    font-size: 21px;
+    letter-spacing: -1.5px;
+  }
+  .nav-item {
+    padding: 12px;
+  }
+  .topbar {
+    height: 60px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .search-box {
+    width: 100%;
+    min-width: 0;
+    padding: 0 9px;
+  }
+  .search-box kbd {
+    display: none;
+  }
+  .topbar-actions {
+    gap: 3px;
+  }
+  .topbar-actions > .icon-button {
+    display: none;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+  .page-content {
+    padding: 25px 15px 10px;
+  }
+  .page-heading h1 {
+    font-size: 25px;
+  }
+  .page-heading .eyebrow {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+  .page-heading {
+    gap: 9px;
+  }
+  .page-heading p {
+    font-size: 10px;
+  }
+  .page-heading .outlined {
+    width: 32px;
+    height: 32px;
+  }
+  .action-tiles {
+    row-gap: 23px;
+    column-gap: 8px;
+  }
+  .tile-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+  }
+  .tile-icon svg {
+    width: 30px;
+  }
+  .action-tile strong {
+    font-size: 10px;
+    margin-top: 12px;
+  }
+  .tile-description {
+    font-size: 8px;
+  }
+  .section-overline {
+    font-size: 8px;
+  }
+  .clock-top > span:first-child {
+    font-size: 7px;
+  }
+  .clock-landscape {
+    padding: 16px;
+    height: 205px;
+  }
+  .clock-time {
+    font-size: 50px;
+    margin-top: 28px;
+  }
+  .clock-date {
+    font-size: 11px;
+  }
+  .clock-next {
+    padding: 16px 13px;
+    gap: 9px;
+  }
+  .clock-next strong {
+    font-size: 10px;
+  }
+  .clock-next .small {
+    font-size: 9px;
+  }
+  .calendar-symbol {
+    width: 30px;
+    height: 34px;
+  }
+  .clock-next > .text-link {
+    display: none;
+  }
+  .panel-heading {
+    padding: 0 13px;
+    min-height: 57px;
+  }
+  .panel-heading > .text-link {
+    font-size: 0;
+    gap: 0;
+  }
+  .panel-heading > .text-link > svg {
+    width: 17px;
+  }
+  .tabs {
+    gap: 17px;
+  }
+  .tabs > button {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .tabs > button > span {
+    font-size: 8px;
+    min-width: 15px;
+  }
+  .meeting-row {
+    padding: 17px 13px;
+    flex-wrap: wrap;
+  }
+  .meeting-row-details {
+    width: calc(100% - 48px);
+    flex: auto;
+  }
+  .meeting-row-details p {
+    font-size: 10px;
+  }
+  .meeting-row-actions {
+    margin-left: 45px;
+  }
+  .meeting-row-actions .button.compact {
+    font-size: 10px;
+    padding: 6px 10px;
+    min-height: 31px;
+  }
+  .list-search {
+    padding: 13px;
+  }
+  .list-search input {
+    font-size: 10px;
+  }
+  .home-note p {
+    font-size: 8px;
+  }
+  .app-footer {
+    font-size: 8px;
+    padding: 20px 15px;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .modal-body {
+    padding: 22px 20px;
+  }
+  .modal-header {
+    padding: 16px 20px;
+  }
+  .modal-header h2 {
+    font-size: 17px;
+  }
+  .modal-footer {
+    padding: 15px 20px;
+  }
+  .modal-footer .button {
+    font-size: 11px;
+    padding: 9px 12px;
+  }
+  .settings-card {
+    padding: 20px 16px;
+  }
+  .settings-profile {
+    gap: 12px;
+  }
+  .settings-profile .large {
+    width: 49px;
+    height: 49px;
+    border-radius: 14px;
+    font-size: 17px;
+  }
+  .settings-profile h2 {
+    font-size: 15px;
+  }
+  .settings-profile p {
+    font-size: 10px;
+  }
+  .settings-section h3 {
+    font-size: 12px;
+  }
+  .preference-row {
+    font-size: 11px;
+    gap: 8px;
+  }
+  .preference-row > span {
+    gap: 7px;
+  }
+  .settings-footer .button {
+    width: 100%;
+  }
+  .lobby-header .wordmark {
+    font-size: 29px;
+  }
+  .lobby-header .back-link {
+    font-size: 10px;
+  }
+  .camera-preview {
+    height: 245px;
+  }
+  .lobby-details {
+    padding: 23px 20px;
+  }
+  .lobby-title p {
+    font-size: 11px;
+  }
+  .toolbar-control {
+    min-width: 44px;
+  }
+  .toolbar-control > span:last-child {
+    font-size: 7px;
+  }
+  .meeting-toolbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 4px;
+    padding: 8px 7px;
+  }
+  .toolbar-group.center {
+    flex: 1;
+    justify-content: center;
+  }
+  .leave-button {
+    padding: 9px;
+  }
+  .room-title {
+    font-size: 11px;
+    gap: 7px;
+  }
+  .participants-panel {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    bottom: 83px;
+    width: 240px;
+    z-index: 3;
+    box-shadow: -10px 0 40px #0006;
+  }
+  .room-notice {
+    font-size: 10px;
+    flex-wrap: wrap;
+  }
+  .share-hint {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

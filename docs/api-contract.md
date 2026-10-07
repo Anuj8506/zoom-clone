@@ -1,7 +1,7 @@
 # Backend API contract
 
 Base URL: `http://127.0.0.1:8000`. Interactive documentation: `/docs`.
-The planned frontend runs at `http://localhost:3000`.
+The frontend runs at `http://localhost:3000`.
 
 ## Endpoint overview
 

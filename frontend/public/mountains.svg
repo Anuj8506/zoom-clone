@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" fill="none">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#467fb0" />
+      <stop offset="1" stop-color="#9ab4c4" />
+    </linearGradient>
+    <linearGradient id="water" x2="0" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3a7894" />
+      <stop offset="1" stop-color="#173e59" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h800v460H0z" />
+  <path
+    fill="#8da7b6"
+    d="m0 255 140-125 150 134 119-153 180 173 132-134 79 91v219H0z"
+  />
+  <path
+    fill="#becbd1"
+    d="m329 213 80-102 77 74-67-31-25 22-21-10zM78 185l62-55 58 52-46-16-17 12-13-12z"
+  />
+  <path
+    fill="#567e94"
+    d="m0 299 177-115 198 170 119-125 142 83 90-105 74 53v200H0z"
+  />
+  <path
+    fill="#315971"
+    d="m0 338 174-83 148 105 147-46 106 26 144-57 81 56v121H0z"
+  />
+  <path fill="url(#water)" d="M0 361h800v99H0z" />
+  <path
+    stroke="#7898a9"
+    stroke-opacity=".28"
+    d="M58 395h235m174 14h270M155 431h290m111-50h163"
+  />
+  <path
+    fill="#163b52"
+    d="m0 352 31-15 71 23-68 15H0zm800-10-78 16-40 17 118-4z"
+  />
+</svg>

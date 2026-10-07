@@ -1,86 +1,135 @@
 # Zoom Clone
 
-A small Scaler assignment project using **Next.js, FastAPI, SQLite, and LiveKit**.
-The backend is implemented first. The Next.js frontend will be added in the next step.
+A small Scaler assignment project using Next.js, plain JavaScript, FastAPI,
+SQLite, and LiveKit. Both the frontend and backend are implemented locally.
+Open **D:\Zoom Clone** in VS Code to inspect the separate folders.
 
-## Current scope
+## Run locally
 
-- Instant meetings with unique 11-digit IDs and frontend invite links.
-- Scheduled meetings with title, description, timezone-aware start time, and duration.
-- Upcoming and recent meeting lists, a default demo user, and repeatable sample data.
-- Meeting lookup by ID or this application's invite link.
-- Host-only Start/End actions and a Waiting for host response.
-- LiveKit access-token generation, participant connection/leave reports, and room cleanup.
-- Separate configuration, database models, validation schemas, routes, and services.
-- Focused tests, setup instructions, and explanations of unfamiliar technologies.
+Dependencies are already installed on this computer. Start these in two separate
+VS Code PowerShell terminals. If the app is already running, use the existing
+instance instead of starting a second copy on the same port.
 
-The dashboard, camera preview, call UI, and client-side waiting screen belong to the
-future frontend. Backend invite URLs are generated for that future frontend.
-
-## Open and run in VS Code
-
-Open **D:\Zoom Clone** with File > Open Folder. Select
-`backend\.venv\Scripts\python.exe` as the Python interpreter.
-
-The virtual environment and dependencies have already been created on this computer.
-Run the backend in a VS Code PowerShell terminal:
+**Terminal 1 — backend:**
 
 ```powershell
 Set-Location 'D:\Zoom Clone\backend'
 & '.\.venv\Scripts\python.exe' -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Visit:
+**Terminal 2 — frontend:**
 
-- API documentation: <http://127.0.0.1:8000/docs>
-- Health: <http://127.0.0.1:8000/health>
+```powershell
+Set-Location 'D:\Zoom Clone\frontend'
+npm.cmd run dev
+```
 
-To run the tests:
+Open <http://localhost:3000>. Backend API documentation: <http://127.0.0.1:8000/docs>.
+Stop a server running in your terminal with Ctrl+C.
+
+## Implemented features
+
+- Zoom-inspired Home with sidebar, profile, local clock/date, and four action tiles.
+- New Meeting generates a unique ID, redirects to a meeting lobby, and provides an invite.
+- Join accepts an ID or app invite link, validates it, and asks for a display name.
+- Schedule saves title, description, future date/time, and duration in SQLite.
+- Upcoming and Recent lists, search, seed data, and a default demo profile.
+- Waiting for the host, host Start/End, camera preview, and a dark meeting room.
+- SDK integration for real audio/video, microphone/camera toggles, screen sharing,
+  participant list, invites, and Leave/End controls.
+- Browser preferences for display name and initial microphone/camera state.
+- Error handling, responsive screens, modular files, and focused verification.
+
+**Live video/audio requires your own LiveKit Cloud credentials.** The UI and
+meeting management work without them; joining a call then shows an honest
+unavailable message. No fake participants or simulated calls are included in
+normal application flows.
+
+Copy `backend/.env.example` to `backend/.env` and fill in `LIVEKIT_URL`,
+`LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`. Restart the backend. Never put the
+API secret in a frontend variable or commit `.env`.
+
+## Verification
 
 ```powershell
 Set-Location 'D:\Zoom Clone\backend'
 & '.\.venv\Scripts\python.exe' -m pytest
+
+Set-Location 'D:\Zoom Clone\frontend'
+npm.cmd run lint
+npm.cmd run build
+npm.cmd run test:e2e
 ```
 
-## Read next
+Browser tests use Microsoft Edge and isolated API/frontend servers on ports
+8001/3001, with a separate SQLite test database. They cover real local API
+workflows. The room rendering test supplies a test-only media token/socket; it
+cannot verify LiveKit Cloud connectivity. See the frontend README for a real
+call checklist once credentials are configured.
 
-- [Backend setup and API examples](backend/README.md)
-- [Detailed explanation of the new technologies](docs/backend-explained.md)
-- [Frontend API contract for the next step](docs/api-contract.md)
-
-## Project organization
+## Folder structure
 
 ```text
 Zoom Clone/
   backend/
     app/
-      config.py            environment configuration
-      database.py          SQLite engine and request sessions
-      main.py              compose the FastAPI application
-      dependencies.py      provide settings/media service to handlers
-      seed_data.py         default user and sample meetings
-      models/              actual SQLAlchemy database tables
-      schemas/             Pydantic request/response shapes
-      routes/              HTTP handlers
-      services/            meeting, participant, and media logic
-      utils/               UTC storage, secret hashing, and API errors
-    tests/                 API workflow and media integration checks
-    seed.py                optional explicit seeding command
-    .env.example           settings template
-    requirements.txt       runtime dependencies
-    requirements-dev.txt   test dependencies
+      config.py, database.py, main.py, dependencies.py, seed_data.py
+      models/       database tables
+      schemas/      validated input/output shapes
+      routes/       HTTP handlers
+      services/     meeting, participant, and media logic
+      utils/        UTC storage, secret hashing, and errors
+    tests/
+    seed.py
+    .env.example
+    requirements.txt, requirements-dev.txt, requirements.lock.txt
+    README.md
+  frontend/
+    public/         local SVG assets
+    src/
+      app/          Next.js routes and CSS entry point
+      components/
+        dashboard/  Home, meeting lists, and preferences
+        forms/      Join and Schedule dialogs
+        layout/     sidebar, header, and page shell
+        meeting/    lobby, preview, session, and room controls
+        ui/         reusable controls
+      hooks/        dashboard data loading
+      services/     API client and browser storage
+      styles/       base, dashboard, forms, meeting, and responsive CSS
+      utils/        formatting and clipboard helper
+    tests/          browser workflow tests
+    .env.example
+    package.json, package-lock.json
+    README.md
   docs/
+    api-contract.md
+    backend-explained.md
+    frontend-explained.md
   .gitignore
   README.md
 ```
 
-## Assumptions
+The src/app folder provides Next.js file-based routing. Interactive pages use
+client components and client-side navigation for the assignment's SPA experience.
+The Python server remains responsible for business rules and data.
 
-The application has one demo owner, not real account authentication. Each newly
-created meeting has its own random host secret; knowing user ID 1 or typing a
-host role does not authorize meeting management. Guest joining requires a display
-name. Planned duration is descriptive and does not automatically end a call.
+## Deliberate limits
 
-Authentication, mute-all/remove controls, webhooks, automatic host-disconnect
-cleanup, and complex infrastructure are deferred. GitHub publication and deployment
-are later steps, after the local project is reviewed.
+One demo owner; no full account authentication. Created meetings have individual
+random host secrets stored in this tab's sessionStorage. Guests never receive
+those secrets in invite links. Four seed records use a public demo token.
+Closing a host tab does not automatically end the meeting; attendance is best
+effort on abrupt exits. Duration is planned length, not an automatic timer.
+
+Authentication, recordings, persistent chat, mute-all/remove controls, webhooks,
+and automatic host-disconnect cleanup are out of scope. SQLite needs persistent
+storage when deployed. GitHub publication and deployment remain later steps.
+
+## Read later
+
+- [Backend setup and API examples](backend/README.md)
+- [Frontend setup and real video-call checklist](frontend/README.md)
+- [Backend technologies explained](docs/backend-explained.md)
+- [Frontend technologies explained](docs/frontend-explained.md)
+- [API contract](docs/api-contract.md)
