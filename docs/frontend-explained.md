@@ -106,7 +106,10 @@ Formatting responses with `toLocaleDateString/TimeString` shows local time again
 `services/api.js` centralizes the API base URL, JSON fetch options, timeout,
 credential headers, and backend error parsing. Components use that shared helper
 instead of duplicating authentication-header logic. Components decide which user
-message and loading state to show.
+message and loading state to show. Requests normally use `/api/backend` on the
+frontend origin; `next.config.mjs` forwards them to the separate Python server.
+This keeps API requests reachable when the frontend is opened from another device
+or an HTTPS demo link. `BACKEND_URL` configures that forwarding destination.
 
 ## 5. Verification boundaries
 

@@ -162,7 +162,7 @@ test("mobile layout and a disconnected backend", async ({ page }) => {
     ),
   ).toBeTruthy();
   await page.getByRole("button", { name: "Close dialog" }).click();
-  await page.route("http://127.0.0.1:8001/**", (route) => route.abort());
+  await page.route("**/api/backend/**", (route) => route.abort());
   await page.reload();
   await expect(page.locator(".alert")).toContainText(
     "Cannot reach the meeting server",
@@ -179,7 +179,9 @@ test("meeting-room controls mount and host End works while media is connecting",
   page.on("pageerror", (err) => errors.push(err.message));
   await page.routeWebSocket("ws://localhost:9999/**", () => {});
   await page.route("**/meetings/*/join", async (route) => {
-    const code = new URL(route.request().url()).pathname.split("/")[2];
+    const code = new URL(route.request().url()).pathname.match(
+      /\/meetings\/([0-9]{11})\/join$/,
+    )[1];
     const meeting = await (
       await request.get(`http://127.0.0.1:8001/meetings/${code}`)
     ).json();

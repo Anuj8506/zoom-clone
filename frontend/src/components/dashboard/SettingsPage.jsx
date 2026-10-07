@@ -16,9 +16,11 @@ export default function SettingsPage() {
     videoEnabled: false,
   });
   const [saved, setSaved] = useState(false);
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     setPreferences(loadPreferences());
+    setPreferencesLoaded(true);
   }, []);
   function update(key, value) {
     setPreferences((current) => ({ ...current, [key]: value }));
@@ -74,6 +76,7 @@ export default function SettingsPage() {
           <label htmlFor="display-name">Default display name</label>
           <input
             id="display-name"
+            disabled={!preferencesLoaded}
             required
             maxLength={80}
             value={preferences.displayName}
@@ -93,6 +96,7 @@ export default function SettingsPage() {
             <input
               type="checkbox"
               checked={preferences.audioEnabled}
+              disabled={!preferencesLoaded}
               onChange={(e) => update("audioEnabled", e.target.checked)}
             />
           </label>
@@ -104,6 +108,7 @@ export default function SettingsPage() {
             <input
               type="checkbox"
               checked={preferences.videoEnabled}
+              disabled={!preferencesLoaded}
               onChange={(e) => update("videoEnabled", e.target.checked)}
             />
           </label>
@@ -115,7 +120,9 @@ export default function SettingsPage() {
         <Alert>{error}</Alert>
         <Alert success>{saved ? "Preferences saved." : ""}</Alert>
         <div className="settings-footer">
-          <button className="button primary">Save preferences</button>
+          <button className="button primary" disabled={!preferencesLoaded}>
+            Save preferences
+          </button>
         </div>
       </form>
     </AppShell>

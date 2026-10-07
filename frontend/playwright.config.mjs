@@ -36,7 +36,9 @@ export default defineConfig({
         "node node_modules/next/dist/bin/next dev --hostname localhost --port 3001",
       url: "http://localhost:3001",
       env: {
-        NEXT_PUBLIC_API_URL: "http://127.0.0.1:8001",
+        NEXT_PUBLIC_API_URL: "/api/backend",
+        BACKEND_URL: "http://127.0.0.1:8001",
+        NEXT_DIST_DIR: ".next/e2e",
         NEXT_TELEMETRY_DISABLED: "1",
       },
       timeout: 120000,

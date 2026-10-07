@@ -21,12 +21,17 @@ run `npm.cmd ci` from this folder. `package-lock.json` pins installed dependenci
 Local defaults work without creating a frontend environment file.
 
 ```dotenv
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_API_URL=/api/backend
+BACKEND_URL=http://127.0.0.1:8000
 ```
 
 To change it, copy `.env.example` to `.env.local`, edit, and restart Next.js.
 NEXT_PUBLIC variables are browser-visible and embedded during production build.
-Set the API URL before building/deploying. LiveKit secrets belong only in the
+By default, browser requests use `/api/backend` on the frontend origin. Next.js
+forwards them to the Python `BACKEND_URL`, so another device does not try to reach
+its own localhost. `BACKEND_URL` is server-only. A direct public API URL remains
+optional if deploying the two services separately.
+Set these URLs before building/deploying. LiveKit secrets belong only in the
 Python backend. Next.js telemetry can be disabled using `NEXT_TELEMETRY_DISABLED=1`.
 
 ## Screens
