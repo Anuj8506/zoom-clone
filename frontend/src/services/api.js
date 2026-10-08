@@ -70,6 +70,12 @@ const participantHeaders = (session) => ({
   "X-Participant-Token": session.participant_token,
 });
 export const api = {
+  adminUsers: (offset = 0) => request(`/admin/users?offset=${offset}`),
+  adminMeetings: (offset = 0) => request(`/admin/meetings?offset=${offset}`),
+  adminEnd: (code) =>
+    request(`/admin/meetings/${encodeURIComponent(code)}/end`, {
+      method: "POST",
+    }),
   muteParticipant: (code, identity, token) =>
     request(
       `/meetings/${encodeURIComponent(code)}/participants/${encodeURIComponent(identity)}/mute`,

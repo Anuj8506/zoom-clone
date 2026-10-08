@@ -28,6 +28,8 @@ export default defineConfig({
         LIVEKIT_URL: "",
         LIVEKIT_API_KEY: "",
         LIVEKIT_API_SECRET: "",
+        ADMIN_USER_ID: "2",
+        ADMIN_EMAIL: "e2e-owner@example.com",
       },
       timeout: 30000,
     },

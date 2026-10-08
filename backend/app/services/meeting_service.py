@@ -123,6 +123,11 @@ def start_meeting(db: Session, meeting: Meeting, token: str | None) -> Meeting:
 
 def mark_ended(db: Session, meeting: Meeting, token: str | None) -> list[str]:
     require_host(meeting, token)
+    return end_authorized_meeting(db, meeting)
+
+
+def end_authorized_meeting(db: Session, meeting: Meeting) -> list[str]:
+    """Caller must authenticate either the meeting host or the site administrator."""
     participants = db.scalars(select(Participant).where(Participant.meeting_id == meeting.id)).all()
     if meeting.status != "ended":
         meeting.status = "ended"

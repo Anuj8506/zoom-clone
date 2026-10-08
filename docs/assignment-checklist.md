@@ -45,9 +45,12 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 
 ## Important assumptions
 
-Bonus update: 22 backend tests, seven frontend workflows, ESLint with no warnings,
+Bonus update: 27 backend tests, eight frontend workflows, ESLint with no warnings,
 production build, and real Cloud generated-media moderation checks passed.
 Account owners can recover their meeting capabilities after signing back in.
+The sole locally configured site administrator can view all account/meeting records
+and end any meeting. Real Cloud testing also verifies the owner's actual sign-in
+and administrator End. Production npm dependencies report zero vulnerabilities.
 
 Created meetings use a private host secret in tab-scoped session storage. Closing
 the host tab can lose that capability; it does not automatically end a meeting.

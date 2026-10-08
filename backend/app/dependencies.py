@@ -7,6 +7,7 @@ from app.utils.errors import fail
 
 from app.config import Settings
 from app.services.media_service import MediaService
+from app.services.admin_service import is_admin
 
 
 def get_settings(request: Request) -> Settings:
@@ -33,3 +34,9 @@ def get_current_user(request: Request, authorization: str | None = Header(defaul
         return user
     except (jwt.InvalidTokenError, ValueError, TypeError):
         fail(401, "SESSION_EXPIRED", "Your session expired. Sign in again or continue as the demo user.")
+
+
+def require_admin(user: User = Depends(get_current_user), settings: Settings = Depends(get_settings)) -> User:
+    if not is_admin(user, settings):
+        fail(403, "ADMIN_ACCESS_DENIED", "Only the site administrator can access this page")
+    return user

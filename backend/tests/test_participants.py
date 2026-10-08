@@ -72,6 +72,22 @@ def test_end_blocks_joins_even_when_remote_cleanup_needs_retry(media_client):
     assert close.await_count == 2
 
 
+def test_late_connected_report_after_end_is_safe_and_does_not_reopen_attendance(media_client):
+    created = instant(media_client)
+    code = created["meeting"]["meeting_code"]
+    participant = join(media_client, code)
+    payload = {"participant_id": participant["participant"]["id"]}
+    headers = {"X-Participant-Token": participant["participant_token"]}
+    assert media_client.post(f"/meetings/{code}/end", headers={"X-Host-Token": created["host_token"]}).status_code == 200
+    assert media_client.post(f"/meetings/{code}/connected", json=payload).status_code == 401
+    report = media_client.post(f"/meetings/{code}/connected", headers=headers, json=payload)
+    assert report.status_code == 200
+    assert report.json()["joined_at"] is None
+    assert report.json()["left_at"] == media_client.get(f"/meetings/{code}").json()["ended_at"]
+    assert media_client.post(f"/meetings/{code}/connected", headers=headers, json=payload).json() == report.json()
+    assert media_client.post(f"/meetings/{code}/join", json={"display_name": "New guest"}).status_code == 410
+
+
 def test_livekit_room_cleanup_revokes_tokens_and_handles_absent_room(media_client):
     service = media_client.app.state.media
     # Use the original method because the fixture stubs it for HTTP workflow tests.

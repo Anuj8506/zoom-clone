@@ -115,6 +115,15 @@ export default function AppShell({
               </div>
             ))}
           </nav>
+          {profile?.is_admin && (
+            <Link
+              href="/admin"
+              className={`nav-item ${pathname === "/admin" ? "active" : ""}`}
+              aria-current={pathname === "/admin" ? "page" : undefined}
+            >
+              <Settings size={20} /> Admin
+            </Link>
+          )}
           <button className="sidebar-support" onClick={() => setHelp(true)}>
             <ChevronDown size={16} /> Support
           </button>

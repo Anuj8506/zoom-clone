@@ -1,6 +1,127 @@
 import { test, expect } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 
+test("sole admin sign-in, account oversight, ending another member's meeting, and denied member access", async ({
+  page,
+  request,
+}) => {
+  await request.post("/api/backend/auth/signup", {
+    data: {
+      display_name: "E2E Site Owner",
+      email: "e2e-owner@example.com",
+      password: "e2e-admin-password",
+    },
+  });
+  const member = await request.post("/api/backend/auth/signup", {
+    data: {
+      display_name: "Admin test member",
+      email: "admin-member@example.com",
+      password: "e2e-member-password",
+    },
+  });
+  const session = await member.json();
+  expect(session.user.is_admin).toBe(false);
+  const headers = { Authorization: `Bearer ${session.access_token}` };
+  const meeting = await (
+    await request.post("/api/backend/meetings/instant", {
+      headers,
+      data: { title: "Administrator test meeting" },
+    })
+  ).json();
+  expect((await request.get("/api/backend/admin/users")).status()).toBe(403);
+  expect(
+    (await request.get("/api/backend/admin/meetings", { headers })).status(),
+  ).toBe(403);
+  expect(
+    (
+      await request.post(
+        `/api/backend/admin/meetings/${meeting.meeting.meeting_code}/end`,
+        { headers },
+      )
+    ).status(),
+  ).toBe(403);
+  await page.goto("/signin");
+  await page.getByLabel("Email address").fill("e2e-owner@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("e2e-admin-password");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await page.getByRole("link", { name: "Admin", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Administrator test meeting",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "End Administrator test meeting",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  expect(
+    (
+      await (
+        await request.get(
+          `/api/backend/meetings/${meeting.meeting.meeting_code}`,
+        )
+      ).json()
+    ).status,
+  ).toBe("live");
+  await page
+    .getByRole("button", {
+      name: "End Administrator test meeting",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "End meeting for all", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", {
+      name: "End Administrator test meeting",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  expect(
+    (
+      await (
+        await request.get(
+          `/api/backend/meetings/${meeting.meeting.meeting_code}`,
+        )
+      ).json()
+    ).status,
+  ).toBe("ended");
+  await page.getByRole("tab", { name: "Accounts", exact: true }).click();
+  await expect(
+    page.getByText("e2e-owner@example.com · Site administrator", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("admin-member@example.com · Member", { exact: true }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Sign Out", exact: true }).click();
+  await page.goto("/admin");
+  await expect(
+    page.getByRole("heading", { name: "Administrator access required" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Admin", exact: true }),
+  ).toHaveCount(0);
+});
+
 test("account signup, isolated calendar, logout, and host recovery after sign-in", async ({
   page,
 }) => {

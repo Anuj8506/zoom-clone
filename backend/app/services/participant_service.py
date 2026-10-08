@@ -47,6 +47,13 @@ def authorized_participant(
 
 
 def record_connected(db: Session, meeting: Meeting, participant: Participant) -> Participant:
+    # A connected callback can arrive after End while media is disconnecting.
+    # Acknowledge the authenticated report without reopening or inventing attendance.
+    if meeting.status == "ended":
+        if participant.left_at is None:
+            participant.left_at = meeting.ended_at
+            db.commit()
+        return participant
     require_live(meeting)
     if participant.left_at is not None:
         fail(409, "PARTICIPANT_LEFT", "Request a new join token to rejoin")

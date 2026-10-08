@@ -221,3 +221,15 @@ POST /meetings/{code}/participants/{identity}/remove disconnects a guest, revoke
 their current media token and records departure. All require X-Host-Token and
 a live meeting. Guests can unmute themselves or rejoin with a fresh invitation.
 See docs/bonus-features.md in the project root for the interview explanation.
+
+## Sole administrator
+
+Run `.\.venv\Scripts\python.exe set_admin.py your-email@example.com` locally
+and enter the owner password when prompted, then restart the backend. This sets
+one `ADMIN_USER_ID`/`ADMIN_EMAIL` pair in the ignored `.env`. The same SQLite users
+table stores the account and password hash. Signup cannot assign admin access.
+
+The owner-only endpoints are GET /admin/users, GET /admin/meetings (100 records
+per page, `offset` query parameter), and POST /admin/meetings/{code}/end. They
+require the configured account's bearer session; host tokens alone cannot grant
+site access. Password hashes and host capabilities are excluded from responses.

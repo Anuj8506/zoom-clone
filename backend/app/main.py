@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import Settings
 from app.database import Base, build_engine
-from app.routes import health, meetings, participants, users, auth, moderation
+from app.routes import health, meetings, participants, users, auth, moderation, admin
 from app.seed_data import ensure_demo_user, seed_database
 from app.services.media_service import MediaService
 
@@ -53,6 +53,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health.router)
     app.include_router(users.router)
     app.include_router(auth.router)
+    app.include_router(admin.router)
     app.include_router(moderation.router)
     app.include_router(meetings.router)
     app.include_router(participants.router)

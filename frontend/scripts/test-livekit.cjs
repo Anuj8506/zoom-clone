@@ -20,7 +20,12 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
   });
   let host;
   let code;
+  let admin;
   const errors = [];
+  const revokedIdentities = new Set();
+  const identities = new Map();
+  const regionRequests = [];
+  const consoleErrors = [];
   try {
     const contexts = await Promise.all([
       browser.newContext(),
@@ -62,8 +67,56 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     }
     host = await contexts[0].newPage();
     const guest = await contexts[1].newPage();
-    for (const page of [host, guest]) {
-      page.on("response", (response) => {
+    if (process.env.TEST_ADMIN_EMAIL && process.env.TEST_ADMIN_PASSWORD) {
+      const adminContext = await browser.newContext();
+      admin = await adminContext.newPage();
+      await admin.goto(appUrl + "/signin");
+      await admin
+        .getByLabel("Email address")
+        .fill(process.env.TEST_ADMIN_EMAIL);
+      await admin
+        .getByLabel("Password", { exact: true })
+        .fill(process.env.TEST_ADMIN_PASSWORD);
+      await admin.getByRole("button", { name: "Sign In", exact: true }).click();
+      await admin.getByRole("link", { name: "Admin", exact: true }).click();
+      await expect(
+        admin.getByRole("heading", { name: "Site administration" }),
+      ).toBeVisible();
+      await admin.getByRole("tab", { name: "Accounts", exact: true }).click();
+      await expect(
+        admin.getByText(
+          process.env.TEST_ADMIN_EMAIL + " · Site administrator",
+          { exact: true },
+        ),
+      ).toBeVisible();
+    }
+    for (const page of [host, guest, admin].filter(Boolean)) {
+      page.on("response", async (response) => {
+        const path = new URL(response.url()).pathname;
+        if (path.endsWith("/join") && response.status() === 200) {
+          const joined = await response.json().catch(() => null);
+          if (joined?.participant?.id)
+            identities.set(page, joined.participant.id);
+        }
+        if (path === "/settings/regions" && response.status() === 401) {
+          const headers = await response.request().allHeaders();
+          let identity;
+          try {
+            identity = JSON.parse(
+              Buffer.from(
+                headers.authorization.split(".")[1],
+                "base64url",
+              ).toString(),
+            ).sub;
+          } catch {
+            /* Unknown credentials must remain a test failure. */
+          }
+          regionRequests.push({
+            url: response.url(),
+            expected: revokedIdentities.has(identity),
+          });
+          return;
+        }
         if (response.status() >= 400)
           errors.push(
             `HTTP ${response.status()}: ${new URL(response.url()).pathname}`,
@@ -71,7 +124,11 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
       });
       page.on("pageerror", (error) => errors.push(error.message));
       page.on("console", (message) => {
-        if (message.type() === "error") errors.push(message.text());
+        if (message.type() === "error")
+          consoleErrors.push({
+            text: message.text(),
+            url: message.location().url,
+          });
       });
     }
     await host.goto(appUrl);
@@ -340,6 +397,10 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
       .click();
     await host
       .getByRole("button", { name: "Remove participant", exact: true })
+      .click({ trial: true });
+    revokedIdentities.add(identities.get(guest));
+    await host
+      .getByRole("button", { name: "Remove participant", exact: true })
       .click();
     await expect(guest.locator(".alert")).toContainText(
       "The host removed you",
@@ -352,16 +413,60 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
       "connected",
       { timeout: 45000 },
     );
-    await host.getByRole("button", { name: "End", exact: true }).click();
-    await host
-      .getByRole("button", { name: "End meeting for all", exact: true })
-      .click();
+    for (const identity of identities.values()) revokedIdentities.add(identity);
+    if (admin) {
+      await admin.goto(appUrl + "/admin");
+      const row = admin.locator(".admin-row").filter({ hasText: code });
+      await row
+        .getByRole("button", { name: "End New Meeting", exact: true })
+        .click();
+      await admin
+        .getByRole("dialog")
+        .getByRole("button", { name: "End meeting for all", exact: true })
+        .click();
+      await expect(admin.getByRole("dialog")).toHaveCount(0, {
+        timeout: 20000,
+      });
+      await expect(
+        host.getByRole("heading", { name: "This meeting has ended" }),
+      ).toBeVisible({ timeout: 45000 });
+    } else {
+      await host.getByRole("button", { name: "End", exact: true }).click();
+      await host
+        .getByRole("button", { name: "End meeting for all", exact: true })
+        .click();
+    }
     await expect(
       guest.getByRole("heading", { name: "This meeting has ended" }),
     ).toBeVisible({ timeout: 45000 });
+    // Cloud rejects a revoked token correctly. The SDK's region cache may refresh
+    // for 30 seconds after disconnect; allow only this exact request for a known
+    // revoked identity. Any active-user 401, app error or RTC error still fails.
+    for (const region of regionRequests) {
+      if (!region.expected)
+        errors.push("Unexpected HTTP 401: /settings/regions");
+    }
+    for (const entry of consoleErrors) {
+      if (
+        entry.text.includes("Failed to load resource") &&
+        regionRequests.some(
+          (region) => region.expected && region.url === entry.url,
+        )
+      )
+        continue;
+      errors.push(entry.text);
+    }
     expect(errors).toEqual([]);
+    if (regionRequests.length)
+      console.log(
+        `NOTE: ${regionRequests.length} expected Cloud region refresh rejections for revoked participant tokens; call and app assertions passed.`,
+      );
+    if (admin)
+      console.log(
+        "PASS: Configured administrator signs in, is the sole admin, sees accounts, and ends another host's real Cloud call gracefully for both participants.",
+      );
     console.log(
-      "PASS: LiveKit Cloud camera/audio, screen share with both cameras visible on desktop/mobile, camera off/on, repeated presenter transitions without layout errors, individual mute, unmute consent declined/accepted, Mute All, Remove, rejoin, and host End. No console or HTTP errors.",
+      "PASS: LiveKit Cloud camera/audio, screen share with both cameras visible on desktop/mobile, camera off/on, repeated presenter transitions without layout errors, individual mute, unmute consent declined/accepted, Mute All, Remove, rejoin, and End. No unexpected console or HTTP errors.",
     );
   } finally {
     if (host && code) {

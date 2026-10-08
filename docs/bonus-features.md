@@ -50,6 +50,31 @@ These meeting controls use the existing SQLite meeting and participant records.
 No new database, database table, or schema migration is required. The meeting
 creator is its host; these are meeting permissions, not a global administrator role.
 
+## Sole site administrator
+
+The site owner account is provisioned locally with `backend/set_admin.py`.
+It creates or updates a normal SQLite account with a salted password hash, then
+sets `ADMIN_USER_ID` and `ADMIN_EMAIL` in the ignored backend `.env`. Both must
+match the authenticated account; the shared demo account cannot be administrator.
+Only one ID/email pair can be configured. No additional database or schema change
+is needed. There is no public endpoint for granting administrator status.
+
+The `/admin` page lists up to 100 meetings/accounts per page and supports ending
+any meeting with confirmation. FastAPI checks the administrator on every admin
+request; hiding the navigation link alone is not authorization. End first marks
+the meeting ended in SQLite, then uses the same graceful LiveKit cleanup as host
+End. Retry End if remote cleanup fails. Other accounts retain their own calendars
+and meeting host controls. Joining as a guest remains available.
+
+Administrator access does not edit source code or deploy changes. App functionality
+is still changed in the project files and tested. This basic panel has no account
+deletion, role delegation, permanent bans, or runtime feature editor.
+
+To replace a temporary password locally, run from the backend folder:
+`.\.venv\Scripts\python.exe set_admin.py your-email@example.com`. The script prompts without
+echoing the password and stores only its hash. Restart the backend afterward.
+Existing account JWTs expire normally; changing a password does not revoke them.
+
 Remove first shows a confirmation. The API verifies that the selected participant
 belongs to this meeting and is not a host. It asks LiveKit Cloud to disconnect
 and revoke the participant's current token, then records left_at. The guest sees
@@ -77,3 +102,9 @@ microphone and canvas tracks in two isolated browser contexts. It verifies scree
 share reception at a phone viewport, individual mute, unmute request decline and
 acceptance, guest-only permissions, Mute All, guest unmute, Remove, fresh rejoin
 and End. This checks browser behavior, not physical mobile hardware quality.
+Set `TEST_ADMIN_EMAIL` and `TEST_ADMIN_PASSWORD` only in the test process environment
+to also check the configured real account and ending another host's Cloud call.
+Tests never print account or media tokens. LiveKit may refresh cached region data
+for 30 seconds after disconnect; a 401 is expected for a revoked token. The media
+test accepts only that exact endpoint with a known revoked participant identity;
+all other console/HTTP errors still fail.

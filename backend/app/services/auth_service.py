@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from app.models import User
 from app.utils.errors import fail
 from app.utils.time import utc_now
+from app.services.admin_service import public_user
 
 
 def password_hash(password, salt=None):
@@ -23,7 +24,7 @@ def issue_session(user, settings):
     token = jwt.encode({"sub": str(user.id), "iat": now, "exp": now + timedelta(hours=8),
                         "iss": "zoom-clone", "aud": "zoom-clone-account"},
                        settings.auth_secret.get_secret_value(), algorithm="HS256")
-    return {"access_token": token, "user": user}
+    return {"access_token": token, "user": public_user(user, settings)}
 
 
 def signup(db, payload, settings):

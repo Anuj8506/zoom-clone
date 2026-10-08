@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     seed_database: bool = True
     demo_user_name: str = Field(default="Demo User", min_length=1, max_length=80)
     auth_secret: SecretStr = SecretStr("")
+    # Only this locally configured account can administer the site.
+    admin_user_id: int | None = Field(default=None, ge=2)
+    admin_email: str = ""
     livekit_url: str = ""
     livekit_api_key: str = Field(default="", repr=False)
     livekit_api_secret: SecretStr = SecretStr("")

@@ -6,3 +6,4 @@ class UserResponse(BaseModel):
     id: int
     display_name: str
     email: str
+    is_admin: bool = False

@@ -14,6 +14,7 @@ def settings(tmp_path):
         database_url=f"sqlite:///{(tmp_path / 'test.db').as_posix()}",
         frontend_url="http://localhost:3000", seed_database=True,
         livekit_url="", livekit_api_key="", livekit_api_secret="",
+        admin_user_id=None, admin_email="",
     )
 
 
