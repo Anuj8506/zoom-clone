@@ -29,7 +29,8 @@ Stop a server running in your terminal with Ctrl+C.
 
 ## Implemented features
 
-- Zoom-inspired Home with sidebar, profile, local clock/date, and four action tiles.
+- Zoom web-portal Home with header, pale sidebar, profile/settings, and New Meeting,
+  Join, and Schedule actions. Upcoming meetings and recent activity are separate sections.
 - New Meeting generates a unique ID, redirects to a meeting lobby, and provides an invite.
 - Join accepts an ID or app invite link, validates it, and asks for a display name.
 - Schedule saves title, description, future date/time, and duration in SQLite.
@@ -65,7 +66,10 @@ Browser tests use Microsoft Edge and isolated API/frontend servers on ports
 8001/3001, with a separate SQLite test database. They cover real local API
 workflows. The room rendering test supplies a test-only media token/socket; it
 cannot verify LiveKit Cloud connectivity. See the frontend README for a real
-call checklist once credentials are configured.
+call checklist once credentials are configured. `npm.cmd run test:media` runs
+the optional real LiveKit Cloud smoke test with generated camera/audio/screen
+tracks; keep the normal servers running and provide valid backend media settings.
+It creates and ends a test meeting and consumes Cloud quota.
 
 ## Folder structure
 
@@ -96,8 +100,9 @@ Zoom Clone/
         ui/         reusable controls
       hooks/        dashboard data loading
       services/     API client and browser storage
-      styles/       base, dashboard, forms, meeting, and responsive CSS
-      utils/        formatting and clipboard helper
+      styles/       base, dashboard, portal, forms, meeting, and responsive CSS
+      utils/        formatting, clipboard, and browser media capability helpers
+    scripts/        optional real LiveKit Cloud smoke test
     tests/          browser workflow tests
     .env.example
     package.json, package-lock.json
@@ -123,8 +128,13 @@ Closing a host tab does not automatically end the meeting; attendance is best
 effort on abrupt exits. Duration is planned length, not an automatic timer.
 
 Authentication, recordings, persistent chat, mute-all/remove controls, webhooks,
-and automatic host-disconnect cleanup are out of scope. SQLite needs persistent
-storage when deployed. GitHub publication and deployment remain later steps.
+and automatic host-disconnect cleanup are out of scope. Login and mute-all/remove
+are bonus features in the assignment; a default logged-in user is required instead.
+Phone browsers without screen-capture support can view a desktop share but cannot
+present their own screen. The UI closely follows the supplied Zoom portal references;
+it is not a pixel-for-pixel reproduction of every Zoom product or promotional section.
+SQLite needs persistent storage when deployed. GitHub publication and permanent
+deployment remain pending; the temporary Cloudflare tunnel forwards to this laptop.
 
 ## Read later
 
@@ -133,3 +143,5 @@ storage when deployed. GitHub publication and deployment remain later steps.
 - [Backend technologies explained](docs/backend-explained.md)
 - [Frontend technologies explained](docs/frontend-explained.md)
 - [API contract](docs/api-contract.md)
+- [Assignment compliance checklist](docs/assignment-checklist.md)
+- [Permanent submission setup](docs/submission.md)
