@@ -40,6 +40,7 @@ export default function Dashboard() {
       onSchedule={() => setDialog("schedule")}
       onJoin={() => setDialog("join")}
       onNew={newMeeting}
+      busy={busy}
     >
       <Alert>{error || data.error}</Alert>
       <div className="portal-dashboard">

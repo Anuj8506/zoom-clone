@@ -86,7 +86,7 @@ export default function MeetingList({
   loading,
   onSchedule,
 }) {
-  if (loading)
+  if (loading && !meetings.length)
     return (
       <div className="list-loading" role="status">
         <span className="spinner" />

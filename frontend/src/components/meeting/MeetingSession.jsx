@@ -5,6 +5,12 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { api } from "@/services/api";
 import MeetingRoom from "./MeetingRoom";
 
+// Let the SDK adjust video quality to visible tile sizes and avoid sending
+// unused camera layers, especially when a phone is watching a shared screen.
+const roomOptions = { adaptiveStream: true, dynacast: true };
+const serverInterrupted =
+  "Connection to the meeting server was interrupted. Your call may still be active.";
+
 export default function MeetingSession({
   meeting,
   session,
@@ -67,18 +73,24 @@ export default function MeetingSession({
 
   useEffect(() => {
     let cancelled = false;
+    let checking = false;
     const timer = setInterval(async () => {
+      if (checking || leaving.current) return;
+      checking = true;
       try {
         const current = await api.meeting(meeting.meeting_code);
+        if (!cancelled)
+          setNotice((previous) =>
+            previous === serverInterrupted ? "" : previous,
+          );
         if (!cancelled && current.status === "ended" && !leaving.current) {
           if (cleanupFailed) setConnect(false);
           else if (!ending) leave("The host ended this meeting.");
         }
       } catch {
-        if (!cancelled)
-          setNotice(
-            "Connection to the meeting server was interrupted. Your call may still be active.",
-          );
+        if (!cancelled) setNotice(serverInterrupted);
+      } finally {
+        checking = false;
       }
     }, 5000);
     return () => {
@@ -133,6 +145,7 @@ export default function MeetingSession({
       token={session.livekit_token}
       serverUrl={session.livekit_url}
       connect={connect}
+      options={roomOptions}
       audio={choices.audioEnabled}
       video={choices.videoEnabled}
       onConnected={onConnected}

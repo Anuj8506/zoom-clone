@@ -70,12 +70,17 @@ export default function MeetingLobby({ code }) {
   useEffect(() => {
     if (!meetingStatus || meetingStatus === "ended" || session) return;
     let cancelled = false;
+    let checking = false;
     const timer = setInterval(async () => {
+      if (checking) return;
+      checking = true;
       try {
         const current = await api.meeting(code);
         if (!cancelled) setMeeting(current);
       } catch (err) {
         if (!cancelled) setError(err.message);
+      } finally {
+        checking = false;
       }
     }, 5000);
     return () => {

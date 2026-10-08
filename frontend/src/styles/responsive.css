@@ -535,6 +535,42 @@
     font-size: 9px;
   }
 }
+/* Keep meeting controls usable when a phone rotates or has a home indicator. */
+@media (max-width: 700px) {
+  .live-meeting .participants-panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    max-width: 85%;
+    z-index: 3;
+  }
+  .live-meeting .meeting-toolbar {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  .screen-share-stage {
+    padding: 6px;
+  }
+}
+@media (max-height: 450px) and (orientation: landscape) {
+  .live-meeting .room-header {
+    height: 40px;
+  }
+  .live-meeting .room-stage {
+    padding: 6px;
+  }
+  .live-meeting .meeting-toolbar {
+    min-height: 60px;
+    padding: 3px 9px;
+  }
+  .live-meeting .toolbar-control {
+    min-height: 48px;
+    gap: 3px !important;
+    padding: 3px !important;
+  }
+  .live-meeting .room-notice {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -30,6 +30,7 @@ export default function AppShell({
   onSchedule,
   onJoin,
   onNew,
+  busy = false,
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function AppShell({
             </button>
           )}
           {onNew && (
-            <button onClick={onNew}>
+            <button onClick={onNew} disabled={busy}>
               Host <ChevronDown size={14} />
             </button>
           )}

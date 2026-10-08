@@ -97,6 +97,17 @@ Screenshots and failure traces go in ignored `test-results/`.
 
 ## Design and scope
 
+Screen sharing depends on the browser's `getDisplayMedia` capability. Phone
+browsers that do not provide it can receive a desktop screen share but cannot
+present their own screen. The existing Share Screen button explains this instead
+of reporting a generic camera/device error. A native mobile app is outside scope.
+See [browser support](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia#browser_compatibility).
+
+LiveKit adaptive streaming and dynacast are enabled to reduce unnecessary video
+bandwidth. Status polling skips overlapping requests, and refreshing dashboard
+lists keeps existing meetings visible. The meeting toolbar fits short landscape
+viewports and respects mobile safe areas.
+
 The dashboard follows the supplied Zoom web-portal screenshots: navy utility
 strip, white header, pale sidebar, profile card, orange New Meeting, blue action
 tiles, upcoming meetings on the right, recent activity on the left, and a dark

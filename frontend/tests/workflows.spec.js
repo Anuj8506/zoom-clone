@@ -178,6 +178,13 @@ test("meeting-room controls mount and host End works while media is connecting",
 }) => {
   // Only this test stubs a media grant/socket. No call is simulated in the app.
   // This catches client-only SDK/rendering errors without requiring Cloud secrets.
+  // Model a phone browser that can receive media but cannot capture a screen.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.mediaDevices, "getDisplayMedia", {
+      value: undefined,
+      configurable: true,
+    });
+  });
   const errors = [];
   page.on("pageerror", (err) => errors.push(err.message));
   await page.routeWebSocket("ws://localhost:9999/**", () => {});
@@ -240,6 +247,20 @@ test("meeting-room controls mount and host End works while media is connecting",
   await expect(
     page.getByRole("button", { name: "Participants", exact: true }),
   ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Share screen", exact: true }).click();
+  await expect(page.locator(".room-notice")).toContainText(
+    "This browser cannot share its screen",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.setViewportSize({ width: 844, height: 390 });
+  const toolbar = await page.locator(".meeting-toolbar").boundingBox();
+  expect(toolbar.y + toolbar.height).toBeLessThanOrEqual(391);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Participants", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: /Participants \(/ }),

@@ -30,6 +30,11 @@ import {
 import { formatCode, initials } from "@/utils/format";
 import Modal from "@/components/ui/Modal";
 import InviteLink from "@/components/ui/InviteLink";
+import {
+  canShareScreen,
+  screenShareUnavailable,
+  screenShareError,
+} from "@/utils/media";
 
 export default function MeetingRoom({
   meeting,
@@ -56,6 +61,7 @@ export default function MeetingRoom({
   const [invite, setInvite] = useState(false);
   const [leaveDialog, setLeaveDialog] = useState(false);
   const [deviceError, setDeviceError] = useState("");
+  const screenShareSupported = canShareScreen();
   const hasShare = tracks.some(
     (track) => track.source === Track.Source.ScreenShare,
   );
@@ -117,7 +123,7 @@ export default function MeetingRoom({
         </div>
       )}
       <div className="room-body">
-        <div className="room-stage">
+        <div className={`room-stage ${hasShare ? "screen-share-stage" : ""}`}>
           {displayTracks.length ? (
             <GridLayout tracks={displayTracks} className="meeting-grid">
               <ParticipantTile />
@@ -222,19 +228,36 @@ export default function MeetingRoom({
             </span>
             <span>Participants</span>
           </button>
-          <TrackToggle
-            source={Track.Source.ScreenShare}
-            showIcon={false}
-            className="toolbar-control share-control"
-            aria-label={
-              isScreenShareEnabled ? "Stop screen sharing" : "Share screen"
-            }
-            captureOptions={{ audio: true }}
-            onDeviceError={deviceFailure}
-          >
-            <ArrowUpFromLine size={24} />
-            <span>{isScreenShareEnabled ? "Stop Share" : "Share Screen"}</span>
-          </TrackToggle>
+          {screenShareSupported || isScreenShareEnabled ? (
+            <TrackToggle
+              source={Track.Source.ScreenShare}
+              showIcon={false}
+              className="toolbar-control share-control"
+              aria-label={
+                isScreenShareEnabled ? "Stop screen sharing" : "Share screen"
+              }
+              captureOptions={{ audio: true }}
+              onDeviceError={(error) => setDeviceError(screenShareError(error))}
+              onChange={(enabled) => {
+                if (enabled) setDeviceError("");
+              }}
+            >
+              <ArrowUpFromLine size={24} />
+              <span>
+                {isScreenShareEnabled ? "Stop Share" : "Share Screen"}
+              </span>
+            </TrackToggle>
+          ) : (
+            <button
+              className="toolbar-control share-control"
+              aria-label="Share screen"
+              title="Screen sharing is unavailable in this browser"
+              onClick={() => setDeviceError(screenShareUnavailable)}
+            >
+              <ArrowUpFromLine size={24} />
+              <span>Share Screen</span>
+            </button>
+          )}
           <button
             className="toolbar-control"
             aria-label="Invite participants"
