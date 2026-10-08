@@ -30,8 +30,8 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 | Login/signup (bonus) | Optional accounts, salted scrypt hashes, JWT session, isolated calendars, host access recovery | Implemented |
 | Mute all/remove (bonus) | Server-verified host token, LiveKit moderation, removal confirmation | Implemented |
 | Public GitHub repository | https://github.com/Anuj8506/zoom-clone, with original commit history | Published |
-| Deployed application | Local services with temporary Cloudflare tunnel | Permanent deployment pending |
-| Submit both links | Requires repository publication and permanent deployment | Pending submission |
+| Deployed application | https://zoom-clone-anuj8506.vercel.app with Render backend | Deployed |
+| Submit both links | Public GitHub repository and Vercel app links are in README | Ready to submit |
 | Understand every line | Explanatory docs prepared; requires the applicant's own review and practice | Cannot be certified by automated testing |
 | Original work | Local source was developed for this task using frameworks/SDKs | No plagiarism certification claimed |
 

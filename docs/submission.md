@@ -1,8 +1,9 @@
 # Permanent submission setup
 
 The assignment requires a public GitHub repository and a deployed app link.
-The current temporary Cloudflare link forwards to a laptop and can disappear.
-It should not be presented as a completed permanent deployment.
+Submit https://github.com/Anuj8506/zoom-clone and
+https://zoom-clone-anuj8506.vercel.app. The temporary Cloudflare link is no longer
+needed for submission.
 
 ## Repository
 
@@ -53,5 +54,5 @@ that seed records and the administrator return after an empty-database reset.
 User-created data can be lost in the selected free setup. The final link must work with the
 applicant's laptop switched off. Submit that link and the public repository link.
 
-Provider choice and free-tier data resets are agreed. Hosting deployment remains
-pending authenticated access to the user's Vercel and Render accounts.
+Both hosting services are deployed. Provider choice and free-tier data resets
+are agreed. Keep the service credentials in private hosting configuration.

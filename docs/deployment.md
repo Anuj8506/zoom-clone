@@ -1,5 +1,13 @@
 # Vercel frontend and Render backend
 
+- App: https://zoom-clone-anuj8506.vercel.app
+- Backend: https://zoom-clone-api-t4xq.onrender.com
+- Public source: https://github.com/Anuj8506/zoom-clone
+
+Both services are connected to the repository's `main` branch. Vercel deploys
+only `frontend`; Render deploys `backend` from the root Blueprint.
+No local tunnel is required for these URLs.
+
 This project uses the free Render demo setup. SQLite stays on Render's ephemeral
 filesystem: accounts and meetings can disappear when the service sleeps, restarts
 or redeploys. Startup restores sample records and the configured sole admin.
@@ -35,6 +43,9 @@ to Render. Browser clients never receive the LiveKit API secret or auth secret.
 
 Finally set Render `FRONTEND_URL` and `CORS_ORIGINS` to the final Vercel HTTPS
 origin. This makes generated invitations point to the deployed app.
+
+The current values are both `https://zoom-clone-anuj8506.vercel.app`.
+Vercel's `BACKEND_URL` is `https://zoom-clone-api-t4xq.onrender.com`.
 
 ## Release checks
 

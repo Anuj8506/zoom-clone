@@ -1,8 +1,11 @@
 # Zoom Clone
 
+Live app: [Zoom Clone](https://zoom-clone-anuj8506.vercel.app).
+Backend health: [Render API](https://zoom-clone-api-t4xq.onrender.com/health).
 Public source: [Anuj8506/zoom-clone](https://github.com/Anuj8506/zoom-clone).
-Hosting targets: Vercel frontend and Render free-demo backend. Deployment links
-will be added after the hosted application has been verified.
+The frontend runs on Vercel; the backend runs on Render's free demo service.
+The app works independently of the developer's laptop. The free backend can
+take 50 seconds or more to wake up; retry after a moment if the first request times out.
 
 A small Scaler assignment project using Next.js, plain JavaScript, FastAPI,
 SQLite, and LiveKit. Both the frontend and backend are implemented locally.
