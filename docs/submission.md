@@ -13,19 +13,21 @@ It should not be presented as a completed permanent deployment.
 4. Add the chosen repository URL as the Git remote and push the existing branch.
 5. Confirm the repository opens while signed out; put final demo/setup links in README.
 
-No repository was created or published as part of this audit.
+Public repository: https://github.com/Anuj8506/zoom-clone.
 
 ## Application
 
-Choose hosting that can run Next.js and a persistent Python service. These can
-be separate services. Keep the SQLite database on a persistent writable disk.
-Do not rely on an ephemeral service filesystem for submitted meeting data.
+The selected targets are Vercel for Next.js and Render's free Python web service.
+The user explicitly selected ephemeral SQLite and accepted account/meeting resets.
+Startup restores seed records and the sole administrator using private environment
+configuration. Use persistent storage for a production service. See deployment.md
+for the checked-in Blueprint and exact hosting configuration.
 
 Backend setup:
 
 - Install backend/requirements.txt and start `uvicorn app.main:app` from backend.
 - Bind the server to 0.0.0.0 and the hosting provider's assigned port.
-- Set DATABASE_URL to the database file on the persistent disk.
+- For the selected free demo, use `sqlite:///./data/zoom_clone.db`.
 - Set FRONTEND_URL to the final HTTPS frontend origin.
 - Set CORS_ORIGINS to that origin if the browser calls the backend directly.
 - Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET as backend-only secrets.
@@ -47,8 +49,9 @@ Frontend setup:
 Open the final HTTPS link in a fresh browser. Confirm default profile, new meeting,
 ID/link joining, scheduling, Upcoming, Recent, guest waiting, media connection,
 and host End. Test with a friend on another device. Restart the backend and verify
-that saved meetings survive. The final link must continue working with the
+that seed records and the administrator return after an empty-database reset.
+User-created data can be lost in the selected free setup. The final link must work with the
 applicant's laptop switched off. Submit that link and the public repository link.
 
-Account access, provider choice, and any paid persistent-storage plan must be
-settled before publication. No hosting account or deployment was created here.
+Provider choice and free-tier data resets are agreed. Hosting deployment remains
+pending authenticated access to the user's Vercel and Render accounts.

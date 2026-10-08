@@ -14,6 +14,7 @@ from app.database import Base, build_engine
 from app.routes import health, meetings, participants, users, auth, moderation, admin
 from app.seed_data import ensure_demo_user, seed_database
 from app.services.media_service import MediaService
+from app.services.admin_bootstrap import ensure_admin_account
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -38,6 +39,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     seed_database(db, settings)
                 else:
                     ensure_demo_user(db, settings)
+                ensure_admin_account(db, settings)
             yield
         finally:
             engine.dispose()

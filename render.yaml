@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: zoom-clone-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.9
+      - key: DATABASE_URL
+        value: sqlite:///./data/zoom_clone.db
+      - key: SEED_DATABASE
+        value: "true"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: ADMIN_USER_ID
+        value: "2"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_DISPLAY_NAME
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false

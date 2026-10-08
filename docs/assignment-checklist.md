@@ -29,7 +29,7 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 | Responsive layout (bonus) | Desktop/mobile workflow and landscape toolbar checks | Implemented; physical phones not fully verified |
 | Login/signup (bonus) | Optional accounts, salted scrypt hashes, JWT session, isolated calendars, host access recovery | Implemented |
 | Mute all/remove (bonus) | Server-verified host token, LiveKit moderation, removal confirmation | Implemented |
-| Public GitHub repository | Local Git history exists; no remote configured at audit time | Pending submission |
+| Public GitHub repository | https://github.com/Anuj8506/zoom-clone, with original commit history | Published |
 | Deployed application | Local services with temporary Cloudflare tunnel | Permanent deployment pending |
 | Submit both links | Requires repository publication and permanent deployment | Pending submission |
 | Understand every line | Explanatory docs prepared; requires the applicant's own review and practice | Cannot be certified by automated testing |

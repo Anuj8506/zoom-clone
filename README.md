@@ -1,5 +1,9 @@
 # Zoom Clone
 
+Public source: [Anuj8506/zoom-clone](https://github.com/Anuj8506/zoom-clone).
+Hosting targets: Vercel frontend and Render free-demo backend. Deployment links
+will be added after the hosted application has been verified.
+
 A small Scaler assignment project using Next.js, plain JavaScript, FastAPI,
 SQLite, and LiveKit. Both the frontend and backend are implemented locally.
 Open **D:\Zoom Clone** in VS Code to inspect the separate folders.
@@ -147,8 +151,10 @@ rate limiting, or server-side logout revocation. Use HTTPS for public access.
 Phone browsers without screen-capture support can view a desktop share but cannot
 present their own screen. The UI closely follows the supplied Zoom portal references;
 it is not a pixel-for-pixel reproduction of every Zoom product or promotional section.
-SQLite needs persistent storage when deployed. GitHub publication and permanent
-deployment remain pending; the temporary Cloudflare tunnel forwards to this laptop.
+The selected free Render demo uses ephemeral SQLite: accounts and meetings can
+reset when the service sleeps, restarts or redeploys. Startup restores samples
+and the configured sole admin through private hosting environment settings.
+See [deployment setup](docs/deployment.md) for the Vercel/Render configuration.
 
 ## Read later
 

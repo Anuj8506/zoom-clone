@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # Only this locally configured account can administer the site.
     admin_user_id: int | None = Field(default=None, ge=2)
     admin_email: str = ""
+    admin_display_name: str = Field(default="Administrator", min_length=1, max_length=80)
+    # Optional hosting-only bootstrap value; never a plaintext password.
+    admin_password_hash: SecretStr = SecretStr("")
     livekit_url: str = ""
     livekit_api_key: str = Field(default="", repr=False)
     livekit_api_secret: SecretStr = SecretStr("")
