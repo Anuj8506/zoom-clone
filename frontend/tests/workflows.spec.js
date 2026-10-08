@@ -1,6 +1,38 @@
 import { test, expect } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 
+test("malformed saved preferences cannot crash the meeting lobby", async ({
+  page,
+  request,
+}) => {
+  const created = await (
+    await request.post("http://127.0.0.1:8001/meetings/instant", { data: {} })
+  ).json();
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "zoom-clone:preferences",
+      JSON.stringify({
+        displayName: { invalid: true },
+        audioEnabled: "false",
+        videoEnabled: "true",
+      }),
+    );
+  });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto(`/join/${created.meeting.meeting_code}`);
+  await expect(page.getByLabel("Your name", { exact: true })).toHaveValue(
+    "Demo User",
+  );
+  await expect(
+    page.getByLabel("Join with microphone on", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    page.getByLabel("Join with camera on", { exact: true }),
+  ).not.toBeChecked();
+  expect(errors).toEqual([]);
+});
+
 test("dashboard, instant invite, unavailable media, and host End", async ({
   page,
 }) => {

@@ -95,6 +95,20 @@ using a test-only media grant/socket. This does not prove real networked media.
 
 Screenshots and failure traces go in ignored `test-results/`.
 
+For an optional real LiveKit Cloud smoke test, keep the normal backend/frontend
+running with valid LiveKit settings and run `npm run test:media`. Edge must be
+installed. This creates and ends a test meeting and uses Cloud quota. Two isolated
+browsers publish generated camera/audio and screen-share tracks; no real camera
+or screen is captured. It verifies reception, phone-sized viewing, Stop Share,
+and host End. Set `TEST_APP_URL` to test another frontend origin if needed.
+This does not replace testing real phone browsers, audible quality, or poor Wi-Fi.
+
+Dependency audit note (2026-10-08): production npm packages and installed Python
+packages had no known advisory findings. The full npm audit reported five linked
+high-severity entries from the development-only ESLint chain ending in `braces`.
+[GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+has no published patch. No major downgrade or forced audit fix was applied.
+
 ## Design and scope
 
 Screen sharing depends on the browser's `getDisplayMedia` capability. Phone

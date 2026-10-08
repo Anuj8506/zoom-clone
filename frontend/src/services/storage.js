@@ -30,9 +30,24 @@ export function loadPreferences() {
     videoEnabled: false,
   };
   try {
+    const saved = JSON.parse(
+      window.localStorage.getItem(PREFERENCES_KEY) || "{}",
+    );
+    if (!saved || typeof saved !== "object" || Array.isArray(saved))
+      return defaults;
     return {
-      ...defaults,
-      ...JSON.parse(window.localStorage.getItem(PREFERENCES_KEY) || "{}"),
+      displayName:
+        typeof saved.displayName === "string" && saved.displayName.trim()
+          ? saved.displayName.trim().slice(0, 80)
+          : defaults.displayName,
+      audioEnabled:
+        typeof saved.audioEnabled === "boolean"
+          ? saved.audioEnabled
+          : defaults.audioEnabled,
+      videoEnabled:
+        typeof saved.videoEnabled === "boolean"
+          ? saved.videoEnabled
+          : defaults.videoEnabled,
     };
   } catch {
     return defaults;
