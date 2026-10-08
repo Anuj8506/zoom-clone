@@ -275,6 +275,53 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     await expect(
       host.getByRole("button", { name: "Remove Automated guest", exact: true }),
     ).toBeVisible();
+    await expect(
+      guest.getByRole("button", {
+        name: "Mute Automated media check",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await host
+      .getByRole("button", { name: "Mute Automated guest", exact: true })
+      .click();
+    await expect(
+      guest.getByRole("button", { name: "Unmute microphone", exact: true }),
+    ).toBeVisible();
+    await host
+      .getByRole("button", {
+        name: "Ask to unmute Automated guest",
+        exact: true,
+      })
+      .click();
+    await expect(
+      guest.getByRole("dialog", { name: "The host asks you to unmute" }),
+    ).toBeVisible();
+    await expect(
+      guest.getByRole("button", { name: "Unmute microphone", exact: true }),
+    ).toBeVisible();
+    await guest
+      .getByRole("button", { name: "Stay muted", exact: true })
+      .click();
+    await expect(guest.getByRole("dialog")).toHaveCount(0);
+    await expect(
+      guest.getByRole("button", { name: "Unmute microphone", exact: true }),
+    ).toBeVisible();
+    await host
+      .getByRole("button", {
+        name: "Ask to unmute Automated guest",
+        exact: true,
+      })
+      .click();
+    await guest
+      .getByRole("dialog")
+      .getByRole("button", { name: "Unmute", exact: true })
+      .click();
+    await expect(
+      guest.getByRole("button", { name: "Mute microphone", exact: true }),
+    ).toBeVisible();
+    await expect(
+      host.getByRole("button", { name: "Mute Automated guest", exact: true }),
+    ).toBeVisible();
     await host.getByRole("button", { name: "Mute All", exact: true }).click();
     await expect(
       guest.getByRole("button", { name: "Unmute microphone", exact: true }),
@@ -314,7 +361,7 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     ).toBeVisible({ timeout: 45000 });
     expect(errors).toEqual([]);
     console.log(
-      "PASS: LiveKit Cloud camera/audio, screen share with both cameras visible on desktop/mobile, camera off/on, repeated presenter transitions without layout errors, Mute All, Remove, rejoin, and host End.",
+      "PASS: LiveKit Cloud camera/audio, screen share with both cameras visible on desktop/mobile, camera off/on, repeated presenter transitions without layout errors, individual mute, unmute consent declined/accepted, Mute All, Remove, rejoin, and host End. No console or HTTP errors.",
     );
   } finally {
     if (host && code) {

@@ -6,6 +6,7 @@ import { DisconnectReason } from "livekit-client";
 import { api } from "@/services/api";
 import MeetingRoom from "./MeetingRoom";
 import MeetingControlListener from "./MeetingControlListener";
+import UnmuteRequest from "./UnmuteRequest";
 
 // Let the SDK adjust video quality to visible tile sizes and avoid sending
 // unused camera layers, especially when a phone is watching a shared screen.
@@ -183,6 +184,7 @@ export default function MeetingSession({
       className="live-meeting"
     >
       <MeetingControlListener onExit={onServerExit} />
+      <UnmuteRequest />
       <MeetingRoom
         meeting={meeting}
         isHost={session.participant.role === "host"}

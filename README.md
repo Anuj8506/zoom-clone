@@ -42,7 +42,7 @@ Stop a server running in your terminal with Ctrl+C.
 - Error handling, responsive screens, modular files, and focused verification.
 - Optional sign-up/sign-in with personal meeting lists, salted password hashing,
   eight-hour account sessions, and recovery of host access after signing back in.
-- Host-only Mute All and Remove controls in the Participants panel.
+- Host-only Mute, Ask to Unmute, Mute All and Remove controls in the Participants panel.
 
 **Live video/audio requires your own LiveKit Cloud credentials.** The UI and
 meeting management work without them; joining a call then shows an honest

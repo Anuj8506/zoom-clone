@@ -37,6 +37,19 @@ the host, requests LiveKit's participant list and mutes active guest microphone
 tracks. It skips host tracks, cameras and screen-share audio. Guests may unmute
 themselves; there is no forced remote unmute.
 
+For a particular guest, Mute looks up that participant and mutes only their
+microphone track. Ask to Unmute writes a unique request ID into that participant's
+server-controlled LiveKit metadata. The guest browser receives the metadata
+event and shows Unmute / Stay muted. Accepting calls setMicrophoneEnabled(true)
+on the guest's own client; declining leaves it off. Each request gets a new ID,
+so a host may ask again after a decline. Guests cannot write their own metadata
+with the issued media grants, and cannot call host endpoints without the host
+capability. Guests retain their own microphone controls.
+
+These meeting controls use the existing SQLite meeting and participant records.
+No new database, database table, or schema migration is required. The meeting
+creator is its host; these are meeting permissions, not a global administrator role.
+
 Remove first shows a confirmation. The API verifies that the selected participant
 belongs to this meeting and is not a host. It asks LiveKit Cloud to disconnect
 and revoke the participant's current token, then records left_at. The guest sees
@@ -61,5 +74,6 @@ pixel-perfect reproduction across all screens is not claimed.
 Run backend pytest, frontend ESLint, Playwright workflows and a production build.
 The optional test:media script uses real LiveKit Cloud with generated camera,
 microphone and canvas tracks in two isolated browser contexts. It verifies screen
-share reception at a phone viewport, Mute All, guest unmute, Remove, fresh rejoin
+share reception at a phone viewport, individual mute, unmute request decline and
+acceptance, guest-only permissions, Mute All, guest unmute, Remove, fresh rejoin
 and End. This checks browser behavior, not physical mobile hardware quality.

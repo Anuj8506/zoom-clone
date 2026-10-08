@@ -214,7 +214,10 @@ scrypt hashes. Sessions expire after eight hours. Configure a private persistent
 AUTH_SECRET; the blank fallback is ephemeral and unsuitable for lasting accounts.
 
 Host-only POST /meetings/{code}/mute-all mutes active guest microphone tracks.
+POST /meetings/{code}/participants/{identity}/mute mutes one guest microphone.
+POST /meetings/{code}/participants/{identity}/ask-unmute sends a consent prompt;
+only the guest's Unmute button enables their microphone. Stay muted declines.
 POST /meetings/{code}/participants/{identity}/remove disconnects a guest, revokes
-their current media token and records departure. Both require X-Host-Token and
+their current media token and records departure. All require X-Host-Token and
 a live meeting. Guests can unmute themselves or rejoin with a fresh invitation.
 See docs/bonus-features.md in the project root for the interview explanation.

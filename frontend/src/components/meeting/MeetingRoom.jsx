@@ -64,6 +64,36 @@ export default function MeetingRoom({
   const [moderating, setModerating] = useState(false);
   const [moderationNotice, setModerationNotice] = useState("");
   const [removeTarget, setRemoveTarget] = useState(null);
+  async function controlAudio(participant, ask) {
+    if (moderating) return;
+    setModerating(true);
+    setModerationNotice("");
+    try {
+      if (ask) {
+        await api.askUnmute(
+          meeting.meeting_code,
+          participant.identity,
+          hostToken,
+        );
+        setModerationNotice(
+          `Unmute request sent to ${participant.name || "Guest"}. They choose whether to accept.`,
+        );
+      } else {
+        await api.muteParticipant(
+          meeting.meeting_code,
+          participant.identity,
+          hostToken,
+        );
+        setModerationNotice(
+          `${participant.name || "Guest"} is muted. They can unmute themselves.`,
+        );
+      }
+    } catch (error) {
+      setModerationNotice(error.message);
+    } finally {
+      setModerating(false);
+    }
+  }
   async function moderate(target = null) {
     if (moderating) return;
     setModerating(true);
@@ -187,14 +217,30 @@ export default function MeetingRoom({
                     <MicOff size={15} />
                   )}
                   {isHost && role !== "host" && !participant.isLocal && (
-                    <button
-                      className="participant-remove"
-                      disabled={moderating}
-                      onClick={() => setRemoveTarget(participant)}
-                      aria-label={`Remove ${participant.name || "Guest"}`}
-                    >
-                      Remove
-                    </button>
+                    <div className="participant-actions">
+                      <button
+                        disabled={moderating || cleanupFailed}
+                        onClick={() =>
+                          controlAudio(
+                            participant,
+                            !participant.isMicrophoneEnabled,
+                          )
+                        }
+                        aria-label={`${participant.isMicrophoneEnabled ? "Mute" : "Ask to unmute"} ${participant.name || "Guest"}`}
+                      >
+                        {participant.isMicrophoneEnabled
+                          ? "Mute"
+                          : "Ask to Unmute"}
+                      </button>
+                      <button
+                        className="participant-remove"
+                        disabled={moderating}
+                        onClick={() => setRemoveTarget(participant)}
+                        aria-label={`Remove ${participant.name || "Guest"}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   )}
                 </div>
               );

@@ -5,6 +5,7 @@ import logging
 import time
 import asyncio
 from datetime import timedelta
+from uuid import uuid4
 
 from aiohttp import ClientError, ClientTimeout
 from livekit import api
@@ -23,6 +24,33 @@ class MediaService:
     def require_configuration(self) -> None:
         if not self.settings.media_configured:
             fail(503, "MEDIA_NOT_CONFIGURED", "Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET in backend/.env")
+
+    async def participant_audio(self, room_name: str, identity: str, *, ask: bool = False) -> int:
+        self.require_configuration()
+        http_url = self.settings.livekit_url.replace("wss://", "https://", 1).replace("ws://", "http://", 1)
+        try:
+            async with api.LiveKitAPI(url=http_url, api_key=self.settings.livekit_api_key,
+                                     api_secret=self.settings.livekit_api_secret.get_secret_value(), timeout=ClientTimeout(total=10)) as client:
+                participant = await client.room.get_participant(api.RoomParticipantIdentity(room=room_name, identity=identity))
+                if ask:
+                    metadata = json.loads(participant.metadata or "{}")
+                    if metadata.get("disconnect_reason"):
+                        fail(409, "PARTICIPANT_LEFT", "This participant is leaving the meeting")
+                    metadata["unmute_request"] = str(uuid4())
+                    await client.room.update_participant(api.UpdateParticipantRequest(room=room_name, identity=identity, metadata=json.dumps(metadata)))
+                    return 0  # Never enable a microphone remotely; only the guest may accept.
+                count = 0
+                for track in participant.tracks:
+                    if track.source == api.TrackSource.MICROPHONE and not track.muted:
+                        await client.room.mute_published_track(api.MuteRoomTrackRequest(room=room_name, identity=identity, track_sid=track.sid, muted=True))
+                        count += 1
+                return count
+        except api.TwirpError as exc:
+            if exc.code == "not_found":
+                fail(404, "PARTICIPANT_NOT_CONNECTED", "This participant is no longer connected")
+            fail(502, "HOST_CONTROL_FAILED", "Could not update the call. Please try again.")
+        except (ClientError, TimeoutError):
+            fail(502, "HOST_CONTROL_FAILED", "Could not update the call. Please try again.")
 
     def issue_token(self, meeting: Meeting, participant: Participant) -> str:
         self.require_configuration()

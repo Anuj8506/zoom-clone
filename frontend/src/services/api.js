@@ -70,6 +70,16 @@ const participantHeaders = (session) => ({
   "X-Participant-Token": session.participant_token,
 });
 export const api = {
+  muteParticipant: (code, identity, token) =>
+    request(
+      `/meetings/${encodeURIComponent(code)}/participants/${encodeURIComponent(identity)}/mute`,
+      { method: "POST", headers: hostHeaders(token) },
+    ),
+  askUnmute: (code, identity, token) =>
+    request(
+      `/meetings/${encodeURIComponent(code)}/participants/${encodeURIComponent(identity)}/ask-unmute`,
+      { method: "POST", headers: hostHeaders(token) },
+    ),
   hostAccess: (code) =>
     request(`/meetings/${encodeURIComponent(code)}/host-access`, {
       method: "POST",
