@@ -549,6 +549,24 @@
   .screen-share-stage {
     padding: 6px;
   }
+  .camera-gallery {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .presentation-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 95px;
+    gap: 6px;
+  }
+  .camera-strip {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .camera-strip .lk-participant-tile {
+    width: 145px;
+    height: 95px;
+  }
 }
 @media (max-height: 450px) and (orientation: landscape) {
   .live-meeting .room-header {

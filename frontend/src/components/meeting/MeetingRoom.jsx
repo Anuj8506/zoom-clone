@@ -2,15 +2,12 @@
 
 import { useState } from "react";
 import {
-  GridLayout,
-  ParticipantTile,
   RoomAudioRenderer,
   TrackToggle,
   useConnectionState,
   useLocalParticipant,
   useParticipants,
   useTracks,
-  StartAudio,
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import {
@@ -31,6 +28,7 @@ import { formatCode, initials } from "@/utils/format";
 import { api } from "@/services/api";
 import Modal from "@/components/ui/Modal";
 import InviteLink from "@/components/ui/InviteLink";
+import MeetingStage from "./MeetingStage";
 import {
   canShareScreen,
   screenShareUnavailable,
@@ -96,12 +94,6 @@ export default function MeetingRoom({
     }
   }
   const screenShareSupported = canShareScreen();
-  const hasShare = tracks.some(
-    (track) => track.source === Track.Source.ScreenShare,
-  );
-  const displayTracks = hasShare
-    ? tracks.filter((track) => track.source === Track.Source.ScreenShare)
-    : tracks;
   const deviceFailure = () =>
     setDeviceError(
       "Could not enable the device. Check your browser permissions and try again.",
@@ -157,31 +149,7 @@ export default function MeetingRoom({
         </div>
       )}
       <div className="room-body">
-        <div className={`room-stage ${hasShare ? "screen-share-stage" : ""}`}>
-          {displayTracks.length ? (
-            <GridLayout tracks={displayTracks} className="meeting-grid">
-              <ParticipantTile />
-            </GridLayout>
-          ) : (
-            <div className="room-connecting">
-              <span className="spinner" />
-              <h2>
-                {cleanupFailed
-                  ? "Meeting ended"
-                  : "Connecting to your meeting…"}
-              </h2>
-              <p>
-                {cleanupFailed
-                  ? "Retry End Meeting to close any remaining connections."
-                  : "Your conversation is a moment away."}
-              </p>
-            </div>
-          )}
-          <StartAudio
-            label="Click to hear meeting audio"
-            className="button audio-play"
-          />
-        </div>
+        <MeetingStage tracks={tracks} cleanupFailed={cleanupFailed} />
         {panel && (
           <aside className="participants-panel">
             <div className="participants-header">

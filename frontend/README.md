@@ -126,6 +126,10 @@ The dashboard follows the supplied Zoom web-portal screenshots: navy utility
 strip, white header, pale sidebar, profile card, orange New Meeting, blue action
 tiles, upcoming meetings on the right, recent activity on the left, and a dark
 footer. The call screen retains its dark background and bottom toolbar.
+While presenting, the shared screen stays large and camera tiles remain in a
+separate strip (right side on desktop, bottom on mobile). MeetingStage keeps
+camera and screen layouts separate and uses stable participant keys, avoiding
+the SDK GridLayout stale-array error during placeholder/video transitions.
 `ProfileCard`, `ActionTiles`, `MeetingList`, and `PortalFooter` keep the UI modular.
 `styles/portal.css` scopes the portal styling without changing meeting-room styles.
 Product advertisements, billing, downloads, and unrelated products are omitted.
