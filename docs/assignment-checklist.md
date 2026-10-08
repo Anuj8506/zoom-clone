@@ -45,7 +45,7 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 
 ## Important assumptions
 
-Bonus update: 27 backend tests, eight frontend workflows, ESLint with no warnings,
+Bonus update: 27 backend tests, ten frontend workflows, ESLint with no warnings,
 production build, and real Cloud generated-media moderation checks passed.
 Account owners can recover their meeting capabilities after signing back in.
 The sole locally configured site administrator can view all account/meeting records

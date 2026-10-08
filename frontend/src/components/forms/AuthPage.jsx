@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
-import { signIn, signOut } from "@/services/auth";
+import { signIn, enterGuestMode } from "@/services/auth";
 import { savePreferences } from "@/services/storage";
 import Alert from "@/components/ui/Alert";
 
@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
   async function submit(event) {
@@ -39,6 +40,7 @@ export default function AuthPage() {
     }
     setBusy(true);
     setError("");
+    setSuccess("");
     try {
       const result = await (signup
         ? api.signup({
@@ -47,6 +49,14 @@ export default function AuthPage() {
             password: enteredPassword,
           })
         : api.login({ email: enteredEmail, password: enteredPassword }));
+      if (signup) {
+        setSignup(false);
+        setEmail(enteredEmail);
+        setPassword("");
+        setSuccess("Account created. Sign in to open your meetings.");
+        setBusy(false);
+        return;
+      }
       signIn(result.access_token);
       try {
         savePreferences({
@@ -69,16 +79,17 @@ export default function AuthPage() {
         </Link>
         <button
           className="auth-switch"
+          disabled={busy || !ready}
           onClick={() => {
             try {
-              signOut();
+              enterGuestMode();
               router.push("/");
             } catch {
               setError("Your browser could not clear the account session.");
             }
           }}
         >
-          Continue as demo user
+          Continue as Guest
         </button>
       </header>
       <main className="auth-card">
@@ -91,6 +102,7 @@ export default function AuthPage() {
         <noscript>
           <p role="alert">Enable JavaScript to sign in to Zoom Clone.</p>
         </noscript>
+        <Alert success>{success}</Alert>
         <form onSubmit={submit} noValidate>
           {signup && (
             <>
@@ -147,10 +159,11 @@ export default function AuthPage() {
         </form>
         <button
           className="auth-switch"
-          disabled={busy}
+          disabled={busy || !ready}
           onClick={() => {
             setSignup(!signup);
             setError("");
+            setSuccess("");
             setPassword("");
           }}
         >

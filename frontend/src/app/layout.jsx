@@ -1,5 +1,6 @@
 import "@livekit/components-styles";
 import "./globals.css";
+import EntryGate from "@/components/layout/EntryGate";
 
 export const metadata = {
   title: "Zoom Clone | Meet simply",
@@ -11,7 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <EntryGate>{children}</EntryGate>
+      </body>
     </html>
   );
 }

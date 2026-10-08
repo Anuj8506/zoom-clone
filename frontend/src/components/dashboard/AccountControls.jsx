@@ -22,7 +22,7 @@ export default function AccountControls({ profile }) {
           onClick={() => {
             try {
               signOut();
-              router.push("/");
+              router.replace("/signin");
             } catch {
               setError(
                 "Could not clear your session. Check your browser storage settings.",

@@ -1,8 +1,18 @@
 # Bonus features and interview explanation
 
-The required no-login demo remains available. Optional sign-up/sign-in lives at
-/signin; Settings provides Sign Out. Each account has its own upcoming/recent
-meetings. Anyone with a meeting invitation can still join as a guest.
+New visitors open `/signin` before accessing the dashboard. Existing users sign
+in; new users sign up, see an account-created confirmation, and then sign in.
+Continue as Guest opens the required no-login demo. Each account has its own
+upcoming/recent meetings. Anyone with an invitation can still join directly as
+a guest. Settings provides Sign Out, which returns to Sign In.
+
+The small EntryGate component holds back dashboard pages until a browser has an
+account session or has explicitly chosen guest mode. The guest choice is stored
+in sessionStorage for that tab and survives refresh; signing in clears it and
+signing out clears both states. This is the entry flow, not server authorization.
+FastAPI still validates JWT signatures and enforces host/admin permissions on
+every protected API request. Invite and meeting routes remain accessible so
+invited guests are not forced to register.
 
 ## Passwords and sessions — new backend concepts
 

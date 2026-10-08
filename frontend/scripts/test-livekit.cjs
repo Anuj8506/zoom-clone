@@ -132,6 +132,9 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
       });
     }
     await host.goto(appUrl);
+    await host
+      .getByRole("button", { name: "Continue as Guest", exact: true })
+      .click();
     const creation = host.waitForResponse(
       (response) =>
         response.url().endsWith("/meetings/instant") &&

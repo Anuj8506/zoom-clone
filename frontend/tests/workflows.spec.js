@@ -1,6 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 
+async function openAsGuest(page) {
+  await page.goto("/signin");
+  await page
+    .getByRole("button", { name: "Continue as Guest", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/$/);
+}
+
 test("sole admin sign-in, account oversight, ending another member's meeting, and denied member access", async ({
   page,
   request,
@@ -114,6 +122,11 @@ test("sole admin sign-in, account oversight, ending another member's meeting, an
   await page.goto("/settings");
   await page.getByRole("button", { name: "Sign Out", exact: true }).click();
   await page.goto("/admin");
+  await expect(page).toHaveURL(/\/signin$/);
+  await page
+    .getByRole("button", { name: "Continue as Guest", exact: true })
+    .click();
+  await page.goto("/admin");
   await expect(
     page.getByRole("heading", { name: "Administrator access required" }),
   ).toBeVisible();
@@ -138,6 +151,12 @@ test("account signup, isolated calendar, logout, and host recovery after sign-in
   await page
     .getByRole("button", { name: "Create account", exact: true })
     .click();
+  await expect(page.locator(".alert.success")).toContainText("Account created");
+  await expect(page).toHaveURL(/\/signin$/);
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("simple-secure-password");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Interview User", exact: true }),
   ).toBeVisible();
@@ -157,7 +176,7 @@ test("account signup, isolated calendar, logout, and host recovery after sign-in
   await page.goto("/settings");
   await page.getByRole("button", { name: "Sign Out", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Demo User", exact: true }),
+    page.getByRole("heading", { name: "Sign In", exact: true }),
   ).toBeVisible();
   await page.goto("/signin");
   await page.getByLabel("Email address").fill(email);
@@ -223,7 +242,7 @@ test("dashboard, instant invite, unavailable media, and host End", async ({
 }) => {
   const errors = [];
   page.on("pageerror", (err) => errors.push(err.message));
-  await page.goto("/");
+  await openAsGuest(page);
   await expect(
     page.getByText("Meeting server connected", { exact: true }),
   ).toBeVisible();
@@ -258,7 +277,7 @@ test("schedule, independent guest waiting, host start, and lookup", async ({
   page,
   context,
 }) => {
-  await page.goto("/");
+  await openAsGuest(page);
   await expect(
     page.getByText("Meeting server connected", { exact: true }),
   ).toBeVisible();
@@ -316,7 +335,7 @@ test("schedule, independent guest waiting, host start, and lookup", async ({
     guest.getByRole("heading", { name: "This meeting has ended" }),
   ).toBeVisible({ timeout: 10000 });
   await guest.close();
-  await page.goto("/");
+  await openAsGuest(page);
   await page.getByRole("button", { name: "Join", exact: true }).click();
   await page.getByLabel("Meeting ID or invite link").fill(invite);
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -326,6 +345,7 @@ test("schedule, independent guest waiting, host start, and lookup", async ({
 test("profile preferences persist, invalid ID errors, and meeting search", async ({
   page,
 }) => {
+  await openAsGuest(page);
   await page.goto("/settings");
   await page.getByLabel("Default display name").fill("Anuj");
   await page.getByLabel("Join with microphone on", { exact: true }).uncheck();
@@ -361,7 +381,7 @@ test("profile preferences persist, invalid ID errors, and meeting search", async
 
 test("mobile layout and a disconnected backend", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await openAsGuest(page);
   await expect(
     page.getByText("Meeting server connected", { exact: true }),
   ).toBeVisible();
@@ -457,7 +477,7 @@ test("meeting-room controls mount and host End works while media is connecting",
   await page.route("**/meetings/*/leave", (route) =>
     route.fulfill({ json: {} }),
   );
-  await page.goto("/");
+  await openAsGuest(page);
   await page.getByRole("button", { name: "New Meeting", exact: true }).click();
   await page.getByLabel("Join with microphone on", { exact: true }).uncheck();
   await page.getByRole("button", { name: "Join meeting", exact: true }).click();
@@ -541,4 +561,36 @@ test("sign-in validates input and accepts password-manager field values", async 
   await expect(
     page.getByRole("heading", { name: "Autofill User", exact: true }),
   ).toBeVisible();
+});
+
+test("new visitors see Sign In first and explicitly enter guest mode", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/signin$/);
+  await expect(
+    page.getByRole("heading", { name: "Sign In", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "New Meeting", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/meetings");
+  await expect(page).toHaveURL(/\/signin$/);
+  await page
+    .getByRole("button", { name: "Continue as Guest", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Demo User", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "New Meeting", exact: true }),
+  ).toBeVisible();
+  await page.goto("/meetings");
+  await expect(
+    page.getByRole("heading", { name: "Meetings", exact: true, level: 1 }),
+  ).toBeVisible();
+  await page.evaluate(() => sessionStorage.removeItem("zoom-clone:guest"));
+  await page.goto("/settings");
+  await expect(page).toHaveURL(/\/signin$/);
 });

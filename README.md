@@ -44,6 +44,7 @@ Stop a server running in your terminal with Ctrl+C.
   eight-hour account sessions, and recovery of host access after signing back in.
 - Host-only Mute, Ask to Unmute, Mute All and Remove controls in the Participants panel.
 - A sole site administrator can view account/meeting records and end any meeting from `/admin`; other users keep their own meeting host controls.
+- New visitors see Sign In first, with Sign Up and Continue as Guest options. Signup asks the user to sign in before opening their dashboard; invitations still allow direct guest joining.
 
 **Live video/audio requires your own LiveKit Cloud credentials.** The UI and
 meeting management work without them; joining a call then shows an honest
