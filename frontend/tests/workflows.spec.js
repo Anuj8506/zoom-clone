@@ -11,7 +11,7 @@ test("dashboard, instant invite, unavailable media, and host End", async ({
     page.getByText("Meeting server connected", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Welcome back." }),
+    page.getByRole("heading", { name: "Demo User", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "New Meeting", exact: true }),
@@ -119,7 +119,10 @@ test("profile preferences persist, invalid ID errors, and meeting search", async
   await expect(
     page.getByLabel("Join with microphone on", { exact: true }),
   ).not.toBeChecked();
-  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Home", exact: true })
+    .click();
   await page.getByRole("button", { name: "Join", exact: true }).click();
   await page.getByLabel("Meeting ID or invite link").fill("123");
   await page.getByRole("button", { name: "Continue", exact: true }).click();

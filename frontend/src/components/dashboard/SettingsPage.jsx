@@ -49,10 +49,7 @@ export default function SettingsPage() {
     <AppShell profile={data.profile} health={data.health}>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">MAKE YOURSELF AT HOME</div>
-          <h1>
-            Settings<span className="heading-dot">.</span>
-          </h1>
+          <h1>Settings</h1>
           <p>A few small preferences for your next meeting.</p>
         </div>
       </div>

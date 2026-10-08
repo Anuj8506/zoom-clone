@@ -1,48 +1,14 @@
-import {
-  Video,
-  Plus,
-  CalendarDays,
-  ArrowUpFromLine,
-  ChevronDown,
-} from "lucide-react";
+import { Video, Plus, CalendarDays } from "lucide-react";
 
-export default function ActionTiles({
-  onNew,
-  onJoin,
-  onSchedule,
-  onShare,
-  busy,
-}) {
+export default function ActionTiles({ onNew, onJoin, onSchedule, busy }) {
   const actions = [
-    {
-      label: "New Meeting",
-      description: "Start a conversation",
-      icon: Video,
-      onClick: onNew,
-      orange: true,
-    },
-    {
-      label: "Join",
-      description: "Meet with an invite",
-      icon: Plus,
-      onClick: onJoin,
-    },
-    {
-      label: "Schedule",
-      description: "Plan a little ahead",
-      icon: CalendarDays,
-      onClick: onSchedule,
-    },
-    {
-      label: "Share Screen",
-      description: "Bring your ideas along",
-      icon: ArrowUpFromLine,
-      onClick: onShare,
-    },
+    { label: "Schedule", icon: CalendarDays, onClick: onSchedule },
+    { label: "Join", icon: Plus, onClick: onJoin },
+    { label: "New Meeting", icon: Video, onClick: onNew, orange: true },
   ];
   return (
     <div className="action-tiles">
-      {actions.map(({ label, description, icon: Icon, onClick, orange }) => (
+      {actions.map(({ label, icon: Icon, onClick, orange }) => (
         <button
           key={label}
           className="action-tile"
@@ -57,11 +23,7 @@ export default function ActionTiles({
               fill={orange ? "currentColor" : "none"}
             />
           </span>
-          <strong>
-            {orange && busy ? "Starting…" : label}
-            {orange && <ChevronDown size={13} />}
-          </strong>
-          <span className="tile-description">{description}</span>
+          <strong>{orange && busy ? "Starting…" : label}</strong>
         </button>
       ))}
     </div>

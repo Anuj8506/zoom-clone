@@ -30,11 +30,8 @@ export default function MeetingsPage() {
     <AppShell profile={data.profile} health={data.health}>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">YOUR CONVERSATIONS, IN ONE PLACE</div>
-          <h1>
-            Meetings<span className="heading-dot">.</span>
-          </h1>
-          <p>A little planning goes a long way.</p>
+          <h1>Meetings</h1>
+          <p>View and manage your upcoming and recent meetings.</p>
         </div>
         <button className="button primary" onClick={() => setSchedule(true)}>
           <Plus size={17} />

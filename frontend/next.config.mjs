@@ -1,6 +1,7 @@
 /** Browser requests stay on the frontend origin; Next.js forwards them to Python. */
 const nextConfig = {
   poweredByHeader: false,
+  devIndicators: false,
   allowedDevOrigins: process.env.ALLOWED_DEV_ORIGIN
     ? [process.env.ALLOWED_DEV_ORIGIN]
     : [],

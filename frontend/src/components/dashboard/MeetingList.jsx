@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Video, Copy, Check, ArrowUpRight } from "lucide-react";
+import {
+  CalendarDays,
+  Video,
+  Copy,
+  Check,
+  ArrowUpRight,
+  PackageOpen,
+} from "lucide-react";
 import { copyText, dateLabel, formatCode, timeLabel } from "@/utils/format";
 import { getHostToken } from "@/services/storage";
 import Alert from "@/components/ui/Alert";
@@ -89,8 +96,12 @@ export default function MeetingList({
   if (!meetings.length)
     return (
       <div className="empty-state">
-        <CalendarDays size={30} />
-        <h3>{recent ? "No recent meetings yet" : "Your calendar is clear"}</h3>
+        {recent ? (
+          <PackageOpen size={80} strokeWidth={1.3} />
+        ) : (
+          <CalendarDays size={30} />
+        )}
+        <h3>{recent ? "No recent activity" : "Your calendar is clear"}</h3>
         <p>
           {recent
             ? "Completed meetings will appear here."

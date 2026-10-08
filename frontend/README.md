@@ -38,7 +38,7 @@ Python backend. Next.js telemetry can be disabled using `NEXT_TELEMETRY_DISABLED
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Zoom-inspired dashboard, four actions, clock, Upcoming/Recent |
+| `/` | Zoom web-portal dashboard, profile, three meeting actions, Upcoming/Recent |
 | `/meetings` | Meeting lists and title/ID/description search |
 | `/settings` | Read-only demo profile and editable local preferences |
 | `/join/{code}` | Guest invite, waiting state, name/device choices |
@@ -48,7 +48,7 @@ The server still validates host rights. Changing URLs or browser UI does not
 grant access. A new meeting returns its host secret once; we store it separately
 from the invite in sessionStorage. Losing that tab session loses host access.
 
-Home Share Screen opens a Join dialog. After joining, click Share Screen in the
+After joining, click Share Screen in the
 toolbar to trigger the browser's screen-picker from your own click.
 
 ## Real audio/video checklist
@@ -97,9 +97,14 @@ Screenshots and failure traces go in ignored `test-results/`.
 
 ## Design and scope
 
-The dashboard follows familiar Zoom patterns: orange New Meeting, blue action
-tiles, a clock/date card, a simple sidebar, and a dark call screen with a bottom
-toolbar. CSS tokens define shared colors. SVG assets are local and handmade;
+The dashboard follows the supplied Zoom web-portal screenshots: navy utility
+strip, white header, pale sidebar, profile card, orange New Meeting, blue action
+tiles, upcoming meetings on the right, recent activity on the left, and a dark
+footer. The call screen retains its dark background and bottom toolbar.
+`ProfileCard`, `ActionTiles`, `MeetingList`, and `PortalFooter` keep the UI modular.
+`styles/portal.css` scopes the portal styling without changing meeting-room styles.
+Product advertisements, billing, downloads, and unrelated products are omitted.
+CSS tokens define shared colors. SVG assets are local and handmade;
 Lucide supplies consistent icons. There are no remote fonts or UI framework.
 
 The media SDK supplies track subscriptions, device toggles, and browser media
