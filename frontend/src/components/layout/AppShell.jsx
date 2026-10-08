@@ -8,7 +8,6 @@ import {
   CalendarDays,
   Settings,
   Search,
-  HelpCircle,
   ChevronRight,
   ChevronDown,
   MessageCircle,
@@ -39,8 +38,25 @@ export default function AppShell({
   return (
     <div className="app-shell portal-shell">
       <div className="utility-bar">
-        <span>Zoom Workplace</span>
-        <button onClick={() => setHelp(true)}>Support</button>
+        <form
+          className="portal-search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            router.push(`/meetings?search=${encodeURIComponent(query)}`);
+          }}
+        >
+          <Search size={20} />
+          <input
+            aria-label="Search meetings"
+            placeholder="Search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </form>
+        <button aria-label="Meeting help" onClick={() => setHelp(true)}>
+          Support
+        </button>
+        {profile?.id === 1 && <Link href="/signin">Sign In</Link>}
       </div>
       <header className="portal-header">
         <Link className="wordmark" href="/" aria-label="Zoom Clone Home">
@@ -104,34 +120,6 @@ export default function AppShell({
           </button>
         </aside>
         <div className="main-shell">
-          <header className="topbar">
-            <span className="topbar-title">My workspace</span>
-            <form
-              className="search-box"
-              onSubmit={(event) => {
-                event.preventDefault();
-                router.push(`/meetings?search=${encodeURIComponent(query)}`);
-              }}
-            >
-              <Search size={17} />
-              <input
-                aria-label="Search meetings"
-                placeholder="Search meetings"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              <kbd>↵</kbd>
-            </form>
-            <div className="topbar-actions">
-              <button
-                className="icon-button"
-                aria-label="Meeting help"
-                onClick={() => setHelp(true)}
-              >
-                <HelpCircle size={21} />
-              </button>
-            </div>
-          </header>
           <main className="page-content">{children}</main>
           <footer className="app-footer">
             <span>

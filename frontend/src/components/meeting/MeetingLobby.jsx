@@ -12,7 +12,12 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import { api } from "@/services/api";
-import { getHostToken, loadPreferences } from "@/services/storage";
+import {
+  getHostToken,
+  saveHostToken,
+  loadPreferences,
+} from "@/services/storage";
+import { accountToken } from "@/services/auth";
 import { dateLabel, timeLabel, formatCode } from "@/utils/format";
 import Alert from "@/components/ui/Alert";
 import InviteLink from "@/components/ui/InviteLink";
@@ -53,7 +58,18 @@ export default function MeetingLobby({ code }) {
     setShareHint(new URLSearchParams(window.location.search).has("share"));
     api
       .meeting(code)
-      .then((data) => {
+      .then(async (data) => {
+        if (accountToken() && !getHostToken(code)) {
+          try {
+            const access = await api.hostAccess(code);
+            if (!cancelled) {
+              saveHostToken(code, access.host_token);
+              setHostToken(access.host_token);
+            }
+          } catch (err) {
+            if (err.status !== 403 && !cancelled) setError(err.message);
+          }
+        }
         if (!cancelled) setMeeting(data);
       })
       .catch((err) => {

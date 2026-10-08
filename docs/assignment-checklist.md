@@ -21,14 +21,14 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 | Auto-generated schedule link | Returned at creation and displayed for copying | Implemented |
 | Store in database | SQLite persistence and restart test | Implemented |
 | Functional conferencing | Real LiveKit Cloud media smoke test with two isolated browsers passed | Implemented; real phone quality still needs device test |
-| Participants | In-room participant list and microphone state | Implemented; mute-all/removal are optional and omitted |
+| Participants | In-room participant list, microphone state, host mute-all and removal | Implemented |
 | No login required | Seeded default user; no signup prerequisite | Implemented |
 | Seed database | Idempotent startup inserts demo user, two scheduled and two completed sample meetings | Implemented |
 | README setup, stack, assumptions | Root, backend, frontend READMEs and explanatory docs | Implemented |
 | Modularity | Separate app routes, components, hooks, services, models, schemas, utilities | Implemented |
 | Responsive layout (bonus) | Desktop/mobile workflow and landscape toolbar checks | Implemented; physical phones not fully verified |
-| Login/signup (bonus) | Outside requested scope | Omitted intentionally |
-| Mute all/remove (bonus) | Outside requested scope | Omitted intentionally |
+| Login/signup (bonus) | Optional accounts, salted scrypt hashes, JWT session, isolated calendars, host access recovery | Implemented |
+| Mute all/remove (bonus) | Server-verified host token, LiveKit moderation, removal confirmation | Implemented |
 | Public GitHub repository | Local Git history exists; no remote configured at audit time | Pending submission |
 | Deployed application | Local services with temporary Cloudflare tunnel | Permanent deployment pending |
 | Submit both links | Requires repository publication and permanent deployment | Pending submission |
@@ -45,6 +45,10 @@ not authorize publishing code, creating accounts, or purchasing hosting.
 
 ## Important assumptions
 
+Bonus update: 22 backend tests, seven frontend workflows, ESLint with no warnings,
+production build, and real Cloud generated-media moderation checks passed.
+Account owners can recover their meeting capabilities after signing back in.
+
 Created meetings use a private host secret in tab-scoped session storage. Closing
 the host tab can lose that capability; it does not automatically end a meeting.
 Attendance is best effort, reported by the browser. Duration is planned length,
@@ -52,6 +56,5 @@ not a meeting auto-end timer. Sample meeting dates age after initial insertion;
 newly scheduled future meetings appear in Upcoming. Invite links use the configured
 FRONTEND_URL. Use one frontend origin consistently when hosting/joining a demo.
 
-Existing verification: 17 backend tests, six frontend workflows, ESLint, production
-build, and real Cloud generated-media smoke test passed. The development-only
-ESLint dependency advisory remains documented in frontend/README.md.
+See docs/bonus-features.md for the expanded account and host-control verification.
+The development-only ESLint dependency advisory remains documented in frontend/README.md.

@@ -134,7 +134,10 @@ Lucide supplies consistent icons. There are no remote fonts or UI framework.
 
 The media SDK supplies track subscriptions, device toggles, and browser media
 transport. Our components supply page flows, state, room chrome, invites, and
-host End behavior. No account auth, recordings, or extra productivity features.
+host End behavior. Optional Sign In / Sign Up provides account calendars;
+Settings provides Sign Out. Hosts can use Mute All and Remove from Participants.
+The backend verifies those permissions before calling LiveKit. No recordings or
+extra productivity features are added. See ../docs/bonus-features.md for details.
 
 Deployment later: set frontend's public API URL, backend FRONTEND_URL and
 CORS_ORIGINS to the real domains, configure Cloud keys, and preserve SQLite with

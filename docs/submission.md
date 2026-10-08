@@ -29,6 +29,7 @@ Backend setup:
 - Set FRONTEND_URL to the final HTTPS frontend origin.
 - Set CORS_ORIGINS to that origin if the browser calls the backend directly.
 - Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET as backend-only secrets.
+- Set a strong persistent AUTH_SECRET; keep it stable to preserve account host access.
 - Keep SEED_DATABASE=true for the initial demonstration database.
 
 Frontend setup:

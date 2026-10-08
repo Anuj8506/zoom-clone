@@ -1,6 +1,70 @@
 import { test, expect } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 
+test("account signup, isolated calendar, logout, and host recovery after sign-in", async ({
+  page,
+}) => {
+  const email = `interview-${Date.now()}@example.com`;
+  await page.goto("/signin");
+  await page
+    .getByRole("button", { name: "New to Zoom Clone? Sign Up" })
+    .click();
+  await page.getByLabel("Full name").fill("Interview User");
+  await page.getByLabel("Email address").fill(email);
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("simple-secure-password");
+  await page
+    .getByRole("button", { name: "Create account", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Interview User", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Team Standup", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Schedule", exact: true }).click();
+  await page.getByLabel("Topic", { exact: true }).fill("Account meeting");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Schedule", exact: true })
+    .click();
+  const invite = await page
+    .getByLabel("Invite link", { exact: true })
+    .inputValue();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Sign Out", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Demo User", exact: true }),
+  ).toBeVisible();
+  await page.goto("/signin");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByLabel("Password", { exact: true }).fill("wrong-password");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page.locator(".alert")).toContainText(
+    "Email or password is incorrect",
+  );
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("simple-secure-password");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Account meeting", exact: true }),
+  ).toBeVisible();
+  await page.goto(invite);
+  await expect(page.getByText("You’re the host")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Start meeting", exact: true }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+});
+
 test("malformed saved preferences cannot crash the meeting lobby", async ({
   page,
   request,

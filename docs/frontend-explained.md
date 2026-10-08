@@ -121,6 +121,11 @@ must be checked against your LiveKit Cloud project after configuring credentials
 
 ## Reading order when you return
 
+New bonus concepts (account sessions, host recovery and moderation) are explained
+in detail in bonus-features.md. AuthPage provides the account form; AccountControls
+provides Sign Out; services/auth.js stores the tab session; MeetingRoom displays
+the host controls while the backend enforces their permissions.
+
 1. `frontend/src/app/page.jsx` → `components/dashboard/Dashboard.jsx`
 2. `components/forms/ScheduleDialog.jsx` → `services/api.js`
 3. `components/meeting/MeetingLobby.jsx`

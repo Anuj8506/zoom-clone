@@ -68,7 +68,8 @@ on port 3000 to open those links; `/meetings/lookup` also validates them.
 
 The default database is `backend/data/zoom_clone.db`, independent of the terminal's
 current folder. Tables are created at startup using `create_all()`. This is not
-a migration tool and will not alter existing columns after a model change.
+a migration tool. One explicit additive startup migration adds the nullable
+password_hash column to databases created before optional accounts were added.
 
 Startup always ensures that demo user ID 1 exists. With `SEED_DATABASE=true`, it
 also inserts two upcoming and two completed sample meetings with attendance.
@@ -84,7 +85,9 @@ Explicit seeding is also available:
 Seeded meeting IDs are `91000000001` through `91000000004`. Their intentionally
 public demo host token is `demo-meetings-host-token`, allowing these demonstration
 records to be started/ended from Swagger. Newly created meetings use private,
-random host tokens; they never use this demo token.
+host tokens; they never use this demo token. Demo-created tokens are random;
+account-created tokens are derived using the persistent server AUTH_SECRET and
+can be retrieved only by the signed-in owner. Only token hashes are stored in SQLite.
 
 ## Try the main workflow in PowerShell
 
@@ -192,10 +195,26 @@ Paid persistent storage or another host's persistent volume is needed for reliab
 
 ## Deliberate limitations
 
-- One default demo owner; no login/signup or per-account isolation.
+- Default demo access plus optional accounts; no password reset or email verification.
 - Attendance is best-effort reporting, not verified server-side media attendance.
 - Abrupt browser exits may leave `left_at` empty and a meeting marked live.
-- A host who loses the browser session's host secret cannot recover management access.
+- A demo host who loses the browser session's secret cannot recover management access.
+  A signed-in account owner can recover their own host access using /host-access.
 - Existing short-lived tokens require remote revocation on End; remote failures require retry.
-- Planned duration does not auto-end calls. Auto-cleanup jobs, webhooks, mute-all,
-  remove controls, and production-scale infrastructure are deferred.
+- Planned duration does not auto-end calls. Auto-cleanup jobs, webhooks,
+  and production-scale infrastructure are deferred.
+
+## Optional accounts and host controls
+
+POST /auth/signup accepts display_name, email and password (8-128 characters).
+POST /auth/login accepts email and password. Both return a bearer access_token
+and a safe user profile. Protected account requests send Authorization: Bearer.
+No Authorization header selects the required demo account. Passwords use salted
+scrypt hashes. Sessions expire after eight hours. Configure a private persistent
+AUTH_SECRET; the blank fallback is ephemeral and unsuitable for lasting accounts.
+
+Host-only POST /meetings/{code}/mute-all mutes active guest microphone tracks.
+POST /meetings/{code}/participants/{identity}/remove disconnects a guest, revokes
+their current media token and records departure. Both require X-Host-Token and
+a live meeting. Guests can unmute themselves or rejoin with a fresh invitation.
+See docs/bonus-features.md in the project root for the interview explanation.

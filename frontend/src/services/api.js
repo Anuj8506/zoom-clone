@@ -1,3 +1,5 @@
+import { accountToken } from "./auth";
+
 export const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || "/api/backend"
 ).replace(/\/$/, "");
@@ -20,6 +22,9 @@ export async function request(
     response = await fetch(`${API_URL}${path}`, {
       method,
       headers: {
+        ...(accountToken()
+          ? { Authorization: `Bearer ${accountToken()}` }
+          : {}),
         ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
         ...headers,
       },
@@ -65,6 +70,22 @@ const participantHeaders = (session) => ({
   "X-Participant-Token": session.participant_token,
 });
 export const api = {
+  hostAccess: (code) =>
+    request(`/meetings/${encodeURIComponent(code)}/host-access`, {
+      method: "POST",
+    }),
+  login: (body) => request("/auth/login", { method: "POST", body }),
+  signup: (body) => request("/auth/signup", { method: "POST", body }),
+  muteAll: (code, token) =>
+    request(`/meetings/${encodeURIComponent(code)}/mute-all`, {
+      method: "POST",
+      headers: hostHeaders(token),
+    }),
+  removeParticipant: (code, identity, token) =>
+    request(
+      `/meetings/${encodeURIComponent(code)}/participants/${encodeURIComponent(identity)}/remove`,
+      { method: "POST", headers: hostHeaders(token) },
+    ),
   health: () => request("/health"),
   profile: () => request("/users/me"),
   upcoming: () => request("/meetings/upcoming"),

@@ -8,11 +8,13 @@ The frontend runs at `http://localhost:3000`.
 | Method and path | Input / credential | Success |
 | --- | --- | --- |
 | GET /health | None | Database status and whether media settings are present |
-| GET /users/me | None | Default demo user's profile |
+| GET /users/me | Optional Authorization: Bearer | Account profile, or default demo profile |
+| POST /auth/signup | display_name, email, password | 201 with account access_token and user |
+| POST /auth/login | email, password | Account access_token and user |
 | POST /meetings/instant | Title/description; `{}` also works | 201 with meeting and creator host token |
 | POST /meetings/scheduled | Title, description, ISO start, integer duration | 201 with meeting and creator host token |
-| GET /meetings/upcoming | None | Array of future scheduled meetings |
-| GET /meetings/recent | None | Array of the latest 20 ended meetings |
+| GET /meetings/upcoming | Optional account bearer token | Current owner's future scheduled meetings |
+| GET /meetings/recent | Optional account bearer token | Current owner's latest 20 ended meetings |
 | POST /meetings/lookup | `meeting_input`: ID or app invite URL | Public meeting |
 | GET /meetings/{code} | Meeting ID | Public meeting and current status |
 | POST /meetings/{code}/start | X-Host-Token | Live meeting |
@@ -20,6 +22,9 @@ The frontend runs at `http://localhost:3000`.
 | POST /meetings/{code}/join | Display name; optional X-Host-Token | Participant credentials and LiveKit connection data |
 | POST /meetings/{code}/connected | Participant ID + X-Participant-Token | Participant with joined_at recorded |
 | POST /meetings/{code}/leave | Participant ID + X-Participant-Token | Participant with left_at recorded |
+| POST /meetings/{code}/host-access | Account bearer token; must own meeting | Private host token for this account meeting |
+| POST /meetings/{code}/mute-all | X-Host-Token | muted_count for guest microphones |
+| POST /meetings/{code}/participants/{identity}/remove | X-Host-Token | removed: true; current session disconnected |
 
 ## Creation
 
@@ -45,7 +50,7 @@ The actual response has this outer structure:
     "status": "scheduled",
     "invite_link": "http://localhost:3000/join/MEETING_ID"
   },
-  "host_token": "random-secret-returned-only-at-creation"
+  "host_token": "private-host-capability"
 }
 ```
 

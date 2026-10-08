@@ -28,6 +28,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { formatCode, initials } from "@/utils/format";
+import { api } from "@/services/api";
 import Modal from "@/components/ui/Modal";
 import InviteLink from "@/components/ui/InviteLink";
 import {
@@ -39,6 +40,7 @@ import {
 export default function MeetingRoom({
   meeting,
   isHost,
+  hostToken,
   onLeave,
   onEnd,
   ending,
@@ -61,6 +63,38 @@ export default function MeetingRoom({
   const [invite, setInvite] = useState(false);
   const [leaveDialog, setLeaveDialog] = useState(false);
   const [deviceError, setDeviceError] = useState("");
+  const [moderating, setModerating] = useState(false);
+  const [moderationNotice, setModerationNotice] = useState("");
+  const [removeTarget, setRemoveTarget] = useState(null);
+  async function moderate(target = null) {
+    if (moderating) return;
+    setModerating(true);
+    setModerationNotice("");
+    try {
+      if (target) {
+        await api.removeParticipant(
+          meeting.meeting_code,
+          target.identity,
+          hostToken,
+        );
+        setRemoveTarget(null);
+        setModerationNotice(
+          `${target.name || "Guest"} was removed from the meeting.`,
+        );
+      } else {
+        const result = await api.muteAll(meeting.meeting_code, hostToken);
+        setModerationNotice(
+          result.muted_count
+            ? "Guest microphones muted. Guests can unmute themselves."
+            : "No active guest microphones to mute.",
+        );
+      }
+    } catch (error) {
+      setModerationNotice(error.message);
+    } finally {
+      setModerating(false);
+    }
+  }
   const screenShareSupported = canShareScreen();
   const hasShare = tracks.some(
     (track) => track.source === Track.Source.ScreenShare,
@@ -106,9 +140,9 @@ export default function MeetingRoom({
           </button>
         </div>
       </header>
-      {(notice || deviceError) && (
+      {(notice || deviceError || moderationNotice) && (
         <div className="room-notice" role="alert">
-          {notice || deviceError}
+          {notice || deviceError || moderationNotice}
           {cleanupFailed && (
             <button onClick={onEnd} disabled={ending}>
               {ending ? "Finishing…" : "Retry End Meeting"}
@@ -184,9 +218,30 @@ export default function MeetingRoom({
                   ) : (
                     <MicOff size={15} />
                   )}
+                  {isHost && role !== "host" && !participant.isLocal && (
+                    <button
+                      className="participant-remove"
+                      disabled={moderating}
+                      onClick={() => setRemoveTarget(participant)}
+                      aria-label={`Remove ${participant.name || "Guest"}`}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               );
             })}
+            {isHost && (
+              <div className="participants-controls">
+                <button
+                  className="button"
+                  disabled={moderating || cleanupFailed}
+                  onClick={() => moderate()}
+                >
+                  {moderating ? "Please wait…" : "Mute All"}
+                </button>
+              </div>
+            )}
           </aside>
         )}
       </div>
@@ -292,6 +347,35 @@ export default function MeetingRoom({
           <div className="modal-footer">
             <button className="button primary" onClick={() => setInvite(false)}>
               Done
+            </button>
+          </div>
+        </Modal>
+      )}
+      {removeTarget && (
+        <Modal
+          title={`Remove ${removeTarget.name || "Guest"}?`}
+          onClose={() => !moderating && setRemoveTarget(null)}
+        >
+          <div className="modal-body">
+            <p>
+              This disconnects the guest from this meeting. They can join again
+              using the invitation.
+            </p>
+          </div>
+          <div className="modal-footer">
+            <button
+              className="button"
+              disabled={moderating}
+              onClick={() => setRemoveTarget(null)}
+            >
+              Cancel
+            </button>
+            <button
+              className="button danger"
+              disabled={moderating}
+              onClick={() => moderate(removeTarget)}
+            >
+              {moderating ? "Removing…" : "Remove participant"}
             </button>
           </div>
         </Modal>

@@ -40,6 +40,9 @@ Stop a server running in your terminal with Ctrl+C.
   participant list, invites, and Leave/End controls.
 - Browser preferences for display name and initial microphone/camera state.
 - Error handling, responsive screens, modular files, and focused verification.
+- Optional sign-up/sign-in with personal meeting lists, salted password hashing,
+  eight-hour account sessions, and recovery of host access after signing back in.
+- Host-only Mute All and Remove controls in the Participants panel.
 
 **Live video/audio requires your own LiveKit Cloud credentials.** The UI and
 meeting management work without them; joining a call then shows an honest
@@ -49,6 +52,9 @@ normal application flows.
 Copy `backend/.env.example` to `backend/.env` and fill in `LIVEKIT_URL`,
 `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`. Restart the backend. Never put the
 API secret in a frontend variable or commit `.env`.
+Set a persistent random `AUTH_SECRET` in backend/.env for account sessions and
+account host recovery. This computer already has one configured. Keep it private
+and stable; changing it invalidates sessions and account meeting capabilities.
 
 ## Verification
 
@@ -121,15 +127,21 @@ The Python server remains responsible for business rules and data.
 
 ## Deliberate limits
 
-One demo owner; no full account authentication. Created meetings have individual
-random host secrets stored in this tab's sessionStorage. Guests never receive
-those secrets in invite links. Four seed records use a public demo token.
+Demo access remains available without signing in. Optional accounts have their
+own upcoming/recent lists. Sessions are kept in this tab's sessionStorage; signing
+out clears the browser session and cached host secrets. Demo-created meetings use
+random host secrets, and account-created meetings use a server-derived host secret
+that only the authenticated owner can retrieve. SQLite stores only its hash.
+Guests never receive those secrets in invites. Four seed records use a demo token.
 Closing a host tab does not automatically end the meeting; attendance is best
 effort on abrupt exits. Duration is planned length, not an automatic timer.
 
-Authentication, recordings, persistent chat, mute-all/remove controls, webhooks,
-and automatic host-disconnect cleanup are out of scope. Login and mute-all/remove
-are bonus features in the assignment; a default logged-in user is required instead.
+Recordings, persistent chat, webhooks, and automatic host-disconnect cleanup
+remain out of scope. Mute All mutes guest microphones; guests can unmute themselves.
+Remove disconnects the selected guest and revokes their current media token;
+it is not a permanent ban, and the invitation can be used to rejoin.
+Account authentication is basic: no password reset, email verification, distributed
+rate limiting, or server-side logout revocation. Use HTTPS for public access.
 Phone browsers without screen-capture support can view a desktop share but cannot
 present their own screen. The UI closely follows the supplied Zoom portal references;
 it is not a pixel-for-pixel reproduction of every Zoom product or promotional section.
@@ -145,3 +157,4 @@ deployment remain pending; the temporary Cloudflare tunnel forwards to this lapt
 - [API contract](docs/api-contract.md)
 - [Assignment compliance checklist](docs/assignment-checklist.md)
 - [Permanent submission setup](docs/submission.md)
+- [Bonus features explained](docs/bonus-features.md)

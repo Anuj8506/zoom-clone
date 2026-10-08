@@ -8,7 +8,7 @@
   background: #fff;
 }
 .utility-bar {
-  height: 34px;
+  height: 40px;
   background: #00031f;
   color: #fff;
   display: flex;
@@ -16,13 +16,35 @@
   justify-content: flex-end;
   gap: 28px;
   padding: 0 32px;
-  font-size: 13px;
+  font-size: 15px;
 }
 .utility-bar button {
   background: none;
   border: 0;
   color: inherit;
   padding: 4px 0;
+}
+.portal-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.portal-search input {
+  width: 145px;
+  min-width: 0;
+  border: 0;
+  padding: 3px 0;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+  border-radius: 0;
+}
+.portal-search input::placeholder {
+  color: #fff;
+  opacity: 1;
+}
+.utility-bar a {
+  color: #fff;
 }
 .portal-header {
   height: 84px;
@@ -73,7 +95,7 @@
 }
 .portal-body {
   display: flex;
-  min-height: calc(100dvh - 118px);
+  min-height: calc(100dvh - 124px);
 }
 .portal-shell .sidebar {
   position: static;
@@ -150,7 +172,7 @@
 }
 .portal-shell .page-content {
   max-width: 1520px;
-  padding: 8px 38px 35px;
+  padding: 45px 38px 35px;
 }
 .portal-shell .app-footer {
   padding: 12px 38px 22px;
@@ -477,10 +499,10 @@
 }
 @media (min-width: 1650px) {
   .portal-shell {
-    --sidebar: 300px;
+    --sidebar: 375px;
   }
   .portal-shell .page-content {
-    padding: 8px 65px 40px;
+    padding: 48px 85px 40px;
   }
   .portal-dashboard {
     gap: 30px;
@@ -567,6 +589,15 @@
     padding: 0 17px;
     gap: 15px;
   }
+  .utility-bar {
+    gap: 20px;
+    padding: 0 18px;
+    font-size: 13px;
+  }
+  .portal-search input {
+    width: 105px;
+    font-size: 13px;
+  }
   .portal-header .wordmark {
     font-size: 39px;
   }
@@ -624,7 +655,7 @@
     display: none;
   }
   .portal-shell .page-content {
-    padding: 8px 18px 25px;
+    padding: 22px 18px 25px;
   }
   .portal-dashboard {
     gap: 18px;

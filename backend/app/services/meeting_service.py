@@ -2,6 +2,8 @@
 
 import re
 import secrets
+import hashlib
+import hmac
 from urllib.parse import unquote, urlsplit
 
 from sqlalchemy import select
@@ -69,15 +71,24 @@ def require_live(meeting: Meeting) -> None:
         fail(410, "MEETING_ENDED", "This meeting has ended")
 
 
+def account_host_token(code: str, owner_id: int, settings: Settings) -> str:
+    # Recoverable only after account authentication; different from account JWTs.
+    return hmac.new(settings.auth_secret.get_secret_value().encode(),
+                    f"meeting-host:{owner_id}:{code}".encode(), hashlib.sha256).hexdigest()
+
+
 def create_meeting(
-    db: Session, payload: InstantMeetingCreate | ScheduledMeetingCreate, kind: str
+    db: Session, payload: InstantMeetingCreate | ScheduledMeetingCreate, kind: str, owner_id: int = 1, settings: Settings | None = None
 ) -> tuple[Meeting, str]:
     host_token = new_secret()
     scheduled = isinstance(payload, ScheduledMeetingCreate)
     for _ in range(5):
+        code = generate_meeting_code()
+        if owner_id != 1 and settings:
+            host_token = account_host_token(code, owner_id, settings)
         meeting = Meeting(
-            meeting_code=generate_meeting_code(),
-            host_user_id=1,
+            meeting_code=code,
+            host_user_id=owner_id,
             host_capability_hash=hash_secret(host_token),
             title=payload.title,
             description=payload.description,
@@ -124,12 +135,12 @@ def mark_ended(db: Session, meeting: Meeting, token: str | None) -> list[str]:
     return [participant.id for participant in participants]
 
 
-def upcoming_meetings(db: Session) -> list[Meeting]:
+def upcoming_meetings(db: Session, owner_id: int = 1) -> list[Meeting]:
     return list(db.scalars(select(Meeting).where(
-        Meeting.kind == "scheduled", Meeting.status == "scheduled", Meeting.scheduled_start_at > utc_now()
+        Meeting.host_user_id == owner_id, Meeting.kind == "scheduled", Meeting.status == "scheduled", Meeting.scheduled_start_at > utc_now()
     ).order_by(Meeting.scheduled_start_at)).all())
 
 
-def recent_meetings(db: Session) -> list[Meeting]:
-    return list(db.scalars(select(Meeting).where(Meeting.status == "ended")
+def recent_meetings(db: Session, owner_id: int = 1) -> list[Meeting]:
+    return list(db.scalars(select(Meeting).where(Meeting.status == "ended", Meeting.host_user_id == owner_id)
         .order_by(Meeting.ended_at.desc()).limit(20)).all())

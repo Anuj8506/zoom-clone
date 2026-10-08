@@ -44,7 +44,8 @@ or reading configuration every time.
 closes afterward. Every request gets its own session. `get_settings` and
 `get_media` read the configured instances from `request.app.state`.
 
-This is not user authentication. Dependency injection merely supplies resources.
+Dependency injection supplies resources. Optional account authentication now uses
+the get_current_user dependency; see bonus-features.md for its separate explanation.
 Actual host authorization still happens in `require_host`.
 
 ### What happens at startup?

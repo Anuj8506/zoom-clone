@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./data/zoom_clone.db"
     seed_database: bool = True
     demo_user_name: str = Field(default="Demo User", min_length=1, max_length=80)
+    auth_secret: SecretStr = SecretStr("")
     livekit_url: str = ""
     livekit_api_key: str = Field(default="", repr=False)
     livekit_api_secret: SecretStr = SecretStr("")

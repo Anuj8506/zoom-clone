@@ -62,10 +62,17 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     for (const page of [host, guest])
       page.on("pageerror", (error) => errors.push(error.message));
     await host.goto(appUrl);
+    const creation = host.waitForResponse(
+      (response) =>
+        response.url().endsWith("/meetings/instant") &&
+        response.request().method() === "POST" &&
+        response.status() === 201,
+    );
     await host
       .getByRole("button", { name: "New Meeting", exact: true })
       .click();
-    await expect(host).toHaveURL(/\/meeting\/\d{11}$/);
+    code = (await (await creation).json()).meeting.meeting_code;
+    await expect(host).toHaveURL(/\/meeting\/\d{11}$/, { timeout: 30000 });
     code = new URL(host.url()).pathname.split("/").pop();
     await host
       .getByRole("button", { name: "Join meeting", exact: true })
@@ -147,6 +154,42 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     await expect(guest.locator(".screen-share-stage")).toHaveCount(0, {
       timeout: 15000,
     });
+    await host
+      .getByRole("button", { name: "Participants", exact: true })
+      .click();
+    await expect(
+      host.getByRole("button", { name: "Remove Automated guest", exact: true }),
+    ).toBeVisible();
+    await host.getByRole("button", { name: "Mute All", exact: true }).click();
+    await expect(
+      guest.getByRole("button", { name: "Unmute microphone", exact: true }),
+    ).toBeVisible({ timeout: 20000 });
+    await expect(
+      host.getByRole("button", { name: "Mute microphone", exact: true }),
+    ).toBeVisible();
+    await guest
+      .getByRole("button", { name: "Unmute microphone", exact: true })
+      .click();
+    await expect(
+      guest.getByRole("button", { name: "Mute microphone", exact: true }),
+    ).toBeVisible();
+    await host
+      .getByRole("button", { name: "Remove Automated guest", exact: true })
+      .click();
+    await host
+      .getByRole("button", { name: "Remove participant", exact: true })
+      .click();
+    await expect(guest.locator(".alert")).toContainText(
+      "The host removed you",
+      { timeout: 20000 },
+    );
+    await guest
+      .getByRole("button", { name: "Rejoin meeting", exact: true })
+      .click();
+    await expect(guest.locator(".connection-label")).toContainText(
+      "connected",
+      { timeout: 45000 },
+    );
     await host.getByRole("button", { name: "End", exact: true }).click();
     await host
       .getByRole("button", { name: "End meeting for all", exact: true })
@@ -156,7 +199,7 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     ).toBeVisible({ timeout: 45000 });
     expect(errors).toEqual([]);
     console.log(
-      "PASS: LiveKit Cloud two-person connection, generated camera/audio reception, generated screen share, phone viewport reception, stop share, and host End. No browser runtime errors.",
+      "PASS: LiveKit Cloud two-person connection, generated camera/audio, screen share, phone reception, Mute All, guest unmute, Remove, rejoin, and host End. No browser runtime errors.",
     );
   } finally {
     if (host && code) {

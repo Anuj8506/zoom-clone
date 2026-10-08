@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
+import { DisconnectReason } from "livekit-client";
 import { api } from "@/services/api";
 import MeetingRoom from "./MeetingRoom";
 
@@ -131,12 +132,14 @@ export default function MeetingSession({
       );
   }
 
-  function onDisconnected() {
+  function onDisconnected(reason) {
     if (!leaving.current && !ending && !cleanupFailed)
       leave(
-        connected.current
-          ? "You’ve disconnected from the meeting."
-          : "Could not connect to the call. Please try joining again.",
+        reason === DisconnectReason.PARTICIPANT_REMOVED
+          ? "The host removed you from this meeting."
+          : connected.current
+            ? "You’ve disconnected from the meeting."
+            : "Could not connect to the call. Please try joining again.",
       );
   }
 
@@ -166,6 +169,7 @@ export default function MeetingSession({
       <MeetingRoom
         meeting={meeting}
         isHost={session.participant.role === "host"}
+        hostToken={hostToken}
         onLeave={() => leave()}
         onEnd={end}
         ending={ending}

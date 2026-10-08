@@ -7,6 +7,7 @@ import AppShell from "@/components/layout/AppShell";
 import Alert from "@/components/ui/Alert";
 import { loadPreferences, savePreferences } from "@/services/storage";
 import { initials } from "@/utils/format";
+import AccountControls from "./AccountControls";
 
 export default function SettingsPage() {
   const data = useDashboard();
@@ -54,6 +55,7 @@ export default function SettingsPage() {
         </div>
       </div>
       <Alert>{data.error}</Alert>
+      <AccountControls profile={data.profile} />
       <form className="settings-card" onSubmit={submit}>
         <div className="settings-profile">
           <div className="avatar large">
@@ -62,7 +64,9 @@ export default function SettingsPage() {
           <div>
             <h2>{data.profile?.display_name || "Demo User"}</h2>
             <p className="muted">{data.profile?.email || "Demo account"}</p>
-            <span className="demo-badge">DEMO PROFILE</span>
+            <span className="demo-badge">
+              {data.profile?.id > 1 ? "PERSONAL PROFILE" : "DEMO PROFILE"}
+            </span>
           </div>
         </div>
         <div className="settings-section">
@@ -80,7 +84,7 @@ export default function SettingsPage() {
             onChange={(e) => update("displayName", e.target.value)}
           />
           <p className="small muted">
-            Your guests see this name. The demo account profile is read-only.
+            Your guests see this name. Account details appear above.
           </p>
         </div>
         <div className="settings-section">
