@@ -130,6 +130,17 @@ While presenting, the shared screen stays large and camera tiles remain in a
 separate strip (right side on desktop, bottom on mobile). MeetingStage keeps
 camera and screen layouts separate and uses stable participant keys, avoiding
 the SDK GridLayout stale-array error during placeholder/video transitions.
+ScreenShareView provides Fit width (with vertical scrolling), Fit screen, and
+dedicated shared-screen fullscreen with an in-page fallback. Video proportions
+are preserved rather than cropping shared text. Desktop camera tiles remain
+visible in the normal presentation layout.
+
+The backend sends server-only participant metadata before forced Remove/End
+cleanup, allowing responsive clients to disconnect gracefully first. Tokens
+explicitly deny client metadata updates, so guests cannot forge these notices.
+The server still revokes/removes participants after a short grace period.
+The real media test now fails on all console errors and HTTP failures, not only
+layout errors. It also verifies width fitting and shared-screen fullscreen.
 `ProfileCard`, `ActionTiles`, `MeetingList`, and `PortalFooter` keep the UI modular.
 `styles/portal.css` scopes the portal styling without changing meeting-room styles.
 Product advertisements, billing, downloads, and unrelated products are omitted.

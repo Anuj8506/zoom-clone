@@ -5,6 +5,7 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { DisconnectReason } from "livekit-client";
 import { api } from "@/services/api";
 import MeetingRoom from "./MeetingRoom";
+import MeetingControlListener from "./MeetingControlListener";
 
 // Let the SDK adjust video quality to visible tile sizes and avoid sending
 // unused camera layers, especially when a phone is watching a shared screen.
@@ -25,6 +26,7 @@ export default function MeetingSession({
   const [ending, setEnding] = useState(false);
   const [cleanupFailed, setCleanupFailed] = useState(false);
   const leaving = useRef(false);
+  const closing = useRef(false);
   const exited = useRef(false);
   const activeSession = useRef(session);
   const connected = useRef(false);
@@ -103,6 +105,8 @@ export default function MeetingSession({
   async function end() {
     if (ending) return;
     setEnding(true);
+    closing.current = true;
+    setConnect(false);
     setNotice("");
     try {
       await api.end(meeting.meeting_code, hostToken);
@@ -118,6 +122,7 @@ export default function MeetingSession({
       } else setNotice(err.message);
     } finally {
       setEnding(false);
+      closing.current = false;
     }
   }
 
@@ -133,7 +138,7 @@ export default function MeetingSession({
   }
 
   function onDisconnected(reason) {
-    if (!leaving.current && !ending && !cleanupFailed)
+    if (!leaving.current && !closing.current && !ending && !cleanupFailed)
       leave(
         reason === DisconnectReason.PARTICIPANT_REMOVED
           ? "The host removed you from this meeting."
@@ -142,6 +147,25 @@ export default function MeetingSession({
             : "Could not connect to the call. Please try joining again.",
       );
   }
+  const onError = useCallback(() => {
+    if (!leaving.current && !closing.current)
+      setNotice(
+        "A call connection or device error occurred. Check your connection and browser permissions.",
+      );
+  }, []);
+  const onMediaDeviceFailure = useCallback(
+    () =>
+      setNotice(
+        "Microphone or camera unavailable. Check browser permissions, or keep it off.",
+      ),
+    [],
+  );
+  const onServerExit = useCallback(
+    (message) => {
+      if (!closing.current) leave(message);
+    },
+    [leave],
+  );
 
   return (
     <LiveKitRoom
@@ -153,19 +177,12 @@ export default function MeetingSession({
       video={choices.videoEnabled}
       onConnected={onConnected}
       onDisconnected={onDisconnected}
-      onError={() =>
-        setNotice(
-          "A call connection or device error occurred. Check your connection and browser permissions.",
-        )
-      }
-      onMediaDeviceFailure={() =>
-        setNotice(
-          "Microphone or camera unavailable. Check browser permissions, or keep it off.",
-        )
-      }
+      onError={onError}
+      onMediaDeviceFailure={onMediaDeviceFailure}
       data-lk-theme="default"
       className="live-meeting"
     >
+      <MeetingControlListener onExit={onServerExit} />
       <MeetingRoom
         meeting={meeting}
         isHost={session.participant.role === "host"}

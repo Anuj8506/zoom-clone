@@ -1,4 +1,7 @@
 const { chromium, expect } = require("@playwright/test");
+const { mkdirSync } = require("node:fs");
+const mediaArtifacts = ".next/media-check";
+mkdirSync(mediaArtifacts, { recursive: true });
 
 const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
   /\/$/,
@@ -60,13 +63,15 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
     host = await contexts[0].newPage();
     const guest = await contexts[1].newPage();
     for (const page of [host, guest]) {
+      page.on("response", (response) => {
+        if (response.status() >= 400)
+          errors.push(
+            `HTTP ${response.status()}: ${new URL(response.url()).pathname}`,
+          );
+      });
       page.on("pageerror", (error) => errors.push(error.message));
       page.on("console", (message) => {
-        if (
-          message.type() === "error" &&
-          message.text().includes("Element not part of the array")
-        )
-          errors.push(message.text());
+        if (message.type() === "error") errors.push(message.text());
       });
     }
     await host.goto(appUrl);
@@ -161,7 +166,9 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
         )
         .toBe(2);
     }
-    await host.screenshot({ path: "test-results/screen-share-desktop.png" });
+    await host.screenshot({
+      path: `${mediaArtifacts}/screen-share-desktop.png`,
+    });
     await guest.setViewportSize({ width: 390, height: 844 });
     await expect
       .poll(
@@ -182,7 +189,35 @@ const appUrl = (process.env.TEST_APP_URL || "http://localhost:3000").replace(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBeTruthy();
-    await guest.screenshot({ path: "test-results/screen-share-mobile.png" });
+    await guest.screenshot({
+      path: `${mediaArtifacts}/screen-share-mobile.png`,
+    });
+    expect(
+      await guest
+        .locator(".screen-video")
+        .evaluate(
+          (element) =>
+            Math.abs(
+              element.clientWidth - element.querySelector("video").clientWidth,
+            ) < 2,
+        ),
+    ).toBeTruthy();
+    await guest
+      .getByRole("button", { name: "Full screen shared screen", exact: true })
+      .click();
+    await expect(guest.locator(".expanded-share")).toBeVisible();
+    const expandedSize = await guest.locator(".expanded-share").boundingBox();
+    expect(expandedSize.width).toBeGreaterThanOrEqual(389);
+    await guest
+      .getByRole("button", { name: "Fit screen", exact: true })
+      .click();
+    await guest
+      .getByRole("button", {
+        name: "Exit shared screen full screen",
+        exact: true,
+      })
+      .click();
+    await expect(guest.locator(".expanded-share")).toHaveCount(0);
     // Camera-off placeholders must survive while a screen stays on the stage.
     await guest
       .getByRole("button", { name: "Stop video", exact: true })

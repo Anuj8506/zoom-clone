@@ -3,6 +3,7 @@
 import json
 import logging
 import time
+import asyncio
 from datetime import timedelta
 
 from aiohttp import ClientError, ClientTimeout
@@ -33,7 +34,7 @@ class MediaService:
             .with_ttl(timedelta(seconds=self.settings.livekit_token_ttl_seconds))
             .with_grants(api.VideoGrants(
                 room_join=True, room=meeting.room_name, room_admin=False,
-                can_publish=True, can_subscribe=True, can_publish_data=True,
+                can_publish=True, can_subscribe=True, can_publish_data=True, can_update_own_metadata=False,
             ))
             .to_jwt()
         )
@@ -48,6 +49,21 @@ class MediaService:
                 api_secret=self.settings.livekit_api_secret.get_secret_value(),
                 timeout=ClientTimeout(total=10),
             ) as client:
+                try:
+                    active = await client.room.list_participants(api.ListParticipantsRequest(room=room_name))
+                except api.TwirpError as exc:
+                    if exc.code != "not_found":
+                        raise
+                    active = api.ListParticipantsResponse()
+                for participant in active.participants:
+                    try:
+                        await client.room.update_participant(api.UpdateParticipantRequest(room=room_name, identity=participant.identity,
+                            metadata=json.dumps({"role": json.loads(participant.metadata or "{}").get("role", "guest"), "disconnect_reason": "meeting-ended"})))
+                    except api.TwirpError as exc:
+                        if exc.code != "not_found":
+                            raise
+                if active.participants:
+                    await asyncio.sleep(1)
                 # LiveKit Cloud also revokes issued tokens, even for pending participants.
                 cutoff = int(time.time()) + 1
                 for identity in participant_ids:
@@ -75,6 +91,9 @@ class MediaService:
                                      api_secret=self.settings.livekit_api_secret.get_secret_value(),
                                      timeout=ClientTimeout(total=10)) as client:
                 if remove_identity:
+                    await client.room.update_participant(api.UpdateParticipantRequest(room=room_name, identity=remove_identity,
+                        metadata=json.dumps({"role": "guest", "disconnect_reason": "removed"})))
+                    await asyncio.sleep(1)
                     await client.room.remove_participant(api.RoomParticipantIdentity(
                         room=room_name, identity=remove_identity, revoke_token_ts=int(time.time()) + 1))
                     return 1

@@ -2,6 +2,7 @@
 
 import { ParticipantTile, StartAudio } from "@livekit/components-react";
 import { Track } from "livekit-client";
+import ScreenShareView from "./ScreenShareView";
 
 export default function MeetingStage({ tracks, cleanupFailed }) {
   const cameras = tracks.filter(
@@ -18,9 +19,9 @@ export default function MeetingStage({ tracks, cleanupFailed }) {
         <div className="presentation-layout" key="presentation">
           <div className="shared-screen-grid" aria-label="Shared screens">
             {shares.map((track) => (
-              <ParticipantTile
+              <ScreenShareView
                 key={`${track.participant.identity}:${track.publication.trackSid}`}
-                trackRef={track}
+                track={track}
               />
             ))}
           </div>

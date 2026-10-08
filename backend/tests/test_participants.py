@@ -27,6 +27,7 @@ def test_signed_media_tokens_roles_and_secret_boundaries(media_client):
     assert claims["sub"] == guest["participant"]["id"]
     assert claims["video"]["room"] == created["meeting"]["room_name"]
     assert claims["video"]["roomJoin"] is True and claims["video"]["roomAdmin"] is False
+    assert claims["video"]["canUpdateOwnMetadata"] is False
     assert claims["exp"] - claims["nbf"] == 300
     assert guest["participant"]["role"] == "guest" and host["participant"]["role"] == "host"
     assert guest["participant"]["display_name"] == "Alex"
@@ -77,6 +78,7 @@ def test_livekit_room_cleanup_revokes_tokens_and_handles_absent_room(media_clien
     from app.services.media_service import MediaService
     import asyncio
     room = AsyncMock()
+    room.list_participants.return_value = api.ListParticipantsResponse()
     room.remove_participant.side_effect = api.TwirpError("not_found", "absent", status=404)
     room.delete_room.side_effect = api.TwirpError("not_found", "absent", status=404)
     fake_api = AsyncMock()

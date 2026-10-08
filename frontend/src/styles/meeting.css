@@ -382,6 +382,67 @@
 .shared-screen-grid video {
   object-fit: contain;
 }
+.screen-view {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #252932;
+  border-radius: 10px;
+}
+.screen-view-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  font-size: 11px;
+  flex: none;
+  background: #191b20;
+}
+.screen-view-controls span {
+  margin-right: auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.screen-view-controls button {
+  background: #343943;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px;
+  white-space: nowrap;
+}
+.screen-video {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.screen-video video {
+  display: block;
+  position: static;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+}
+.fit-screen .screen-video {
+  overflow: hidden;
+}
+.fit-screen .screen-video video {
+  height: 100%;
+}
+.expanded-share {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  border-radius: 0;
+}
+.screen-view:fullscreen {
+  width: 100%;
+  height: 100%;
+}
 .camera-strip {
   display: flex;
   flex-direction: column;
