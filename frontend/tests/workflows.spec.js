@@ -502,3 +502,43 @@ test("meeting-room controls mount and host End works while media is connecting",
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("sign-in validates input and accepts password-manager field values", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/signin");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page.locator(".alert")).toContainText(
+    "Enter a valid email address",
+  );
+  await page.getByLabel("Email address").fill("unknown@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("short");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page.locator(".alert")).toContainText("at least 8 characters");
+  await page.getByLabel("Password", { exact: true }).fill("invalid-password");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page.locator(".alert")).toContainText(
+    "Email or password is incorrect",
+  );
+  await expect(
+    page.getByRole("button", { name: "Sign In", exact: true }),
+  ).toBeEnabled();
+  const email = `autofill-${randomUUID()}@example.com`;
+  const password = "autofill-test-password";
+  const signup = await request.post("/api/backend/auth/signup", {
+    data: { display_name: "Autofill User", email, password },
+  });
+  expect(signup.status()).toBe(201);
+  await page.evaluate(
+    ({ email, password }) => {
+      document.getElementById("account-email").value = email;
+      document.getElementById("account-password").value = password;
+    },
+    { email, password },
+  );
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Autofill User", exact: true }),
+  ).toBeVisible();
+});

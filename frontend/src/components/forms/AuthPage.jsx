@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
@@ -15,15 +15,38 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
+    // Read the fields at submit time, including password-manager/autofill values.
+    const fields = new FormData(event.currentTarget);
+    const enteredEmail = String(fields.get("email") || "").trim();
+    const enteredPassword = String(fields.get("password") || "");
+    const enteredName = String(fields.get("display_name") || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enteredEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (enteredPassword.length < 8) {
+      setError("Enter a password with at least 8 characters.");
+      return;
+    }
+    if (signup && !enteredName) {
+      setError("Enter your full name.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       const result = await (signup
-        ? api.signup({ display_name: name, email, password })
-        : api.login({ email, password }));
+        ? api.signup({
+            display_name: enteredName,
+            email: enteredEmail,
+            password: enteredPassword,
+          })
+        : api.login({ email: enteredEmail, password: enteredPassword }));
       signIn(result.access_token);
       try {
         savePreferences({
@@ -65,12 +88,16 @@ export default function AuthPage() {
             ? "Create your Zoom Clone account"
             : "Welcome back to Zoom Clone"}
         </p>
-        <form onSubmit={submit}>
+        <noscript>
+          <p role="alert">Enable JavaScript to sign in to Zoom Clone.</p>
+        </noscript>
+        <form onSubmit={submit} noValidate>
           {signup && (
             <>
               <label htmlFor="account-name">Full name</label>
               <input
                 id="account-name"
+                name="display_name"
                 required
                 maxLength={80}
                 autoComplete="name"
@@ -82,6 +109,7 @@ export default function AuthPage() {
           <label htmlFor="account-email">Email address</label>
           <input
             id="account-email"
+            name="email"
             type="email"
             required
             maxLength={255}
@@ -92,6 +120,7 @@ export default function AuthPage() {
           <label htmlFor="account-password">Password</label>
           <input
             id="account-password"
+            name="password"
             type="password"
             required
             minLength={8}
@@ -102,8 +131,18 @@ export default function AuthPage() {
           />
           <p className="small muted">Use at least 8 characters.</p>
           <Alert>{error}</Alert>
-          <button className="button primary full-width" disabled={busy}>
-            {busy ? "Please wait…" : signup ? "Create account" : "Sign In"}
+          <button
+            className="button primary full-width"
+            type="submit"
+            disabled={busy || !ready}
+          >
+            {!ready
+              ? "Loading form…"
+              : busy
+                ? "Please wait…"
+                : signup
+                  ? "Create account"
+                  : "Sign In"}
           </button>
         </form>
         <button

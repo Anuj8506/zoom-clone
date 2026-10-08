@@ -29,6 +29,10 @@ Before using a tunnel:
    frontend. Restart the backend, open the HTTPS link yourself, and create a new meeting.
    Host tokens are scoped to the browser origin: a token saved on localhost is
    not automatically available on the tunnel origin.
+   Restart `next dev` after changing the hostname: an `.env.local` reload message
+   alone does not update the already-loaded `allowedDevOrigins` configuration.
+   Verify an interactive action such as Sign In through the public URL, not only
+   an HTTP 200 response; a page can render before its React form is ready.
 6. Send that meeting's HTTPS invite to your friend. Keep both servers and the
    tunnel running. Stopping the tunnel ends access through that link.
 
