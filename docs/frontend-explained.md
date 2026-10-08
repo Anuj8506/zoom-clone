@@ -59,15 +59,18 @@ relative paths such as `../../../services/api`.
 `LiveKitRoom` provides React context: its child controls can find the same room
 without passing a room object through every component.
 
-`useTracks()` subscribes to camera and screen-share track state. `GridLayout`
-and `ParticipantTile` display those tracks, including camera-off placeholders.
+`useTracks()` subscribes to camera and screen-share track state. `MeetingStage`
+uses a CSS gallery and `ParticipantTile` to display camera tracks and camera-off
+placeholders with stable participant keys. It avoids the SDK GridLayout's stale
+track-array errors when a placeholder becomes a published camera.
 `RoomAudioRenderer` plays remote audio. `StartAudio` supplies a click if browser
 autoplay rules prevent sound from starting automatically.
 
 `TrackToggle` manages microphone, camera, or screen-share publishing. We use its
 real enabled state for the icons and labels rather than a pretend local flag.
 Screen sharing requires an explicit click so the browser can show its picker.
-When a screen is shared, our stage focuses on screen-share tracks.
+When a screen is shared, our stage shows the screen prominently and keeps camera
+tiles visible beside it on desktop or underneath it on mobile.
 
 `useParticipants()` supplies the live participant list, and `useLocalParticipant()`
 supplies local mic/camera/share state. The room UI uses these SDK hooks; the database
